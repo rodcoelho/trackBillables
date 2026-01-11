@@ -35,3 +35,13 @@ next-env.d.ts
 
 # Snyk Security Extension - AI Rules (auto-generated)
 .cursor/rules/snyk_rules.mdc
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# IDE and editor files
+.cursor/
+.vscode/
+
+# Temporary test files
+test.txt
