@@ -10,6 +10,19 @@ export async function GET(request: Request) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      // If trying to access admin routes, verify admin status
+      if (next.startsWith('/admin')) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: isAdmin } = await supabase.rpc('is_admin', { user_uuid: user.id });
+
+          // If not an admin, redirect to admin login with error
+          if (!isAdmin) {
+            return NextResponse.redirect(`${origin}/admin?error=access_denied`);
+          }
+        }
+      }
+
       const forwardedHost = request.headers.get('x-forwarded-host');
       const isLocalEnv = process.env.NODE_ENV === 'development';
       if (isLocalEnv) {
