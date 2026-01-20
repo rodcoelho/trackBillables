@@ -1,17 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
 import type { Subscription } from '@/types/database.types';
 
-// Force dynamic rendering for this page
-export const dynamic = 'force-dynamic';
-
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
 
-export default function PricingPage() {
+function PricingPageContent() {
   const [loading, setLoading] = useState(false);
   const [billingInterval, setBillingInterval] = useState<'month' | 'year'>('month');
   const [subscription, setSubscription] = useState<Subscription | null>(null);
@@ -230,5 +227,13 @@ export default function PricingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PricingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center"><div className="text-gray-600 dark:text-gray-400">Loading...</div></div>}>
+      <PricingPageContent />
+    </Suspense>
   );
 }
