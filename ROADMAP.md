@@ -19,12 +19,16 @@ This document outlines our upcoming priorities and implementation steps.
 
 **Goal**: Make billing production-ready before going live
 
+**⚠️ IMPORTANT**: Stripe requires a live, accessible website before activating production mode. Complete Phase A (Deploy Live with TEST mode keys) first, then return here to create production Stripe products.
+
 #### Tasks:
-1. **Create Production Stripe Products**
+1. **Create Production Stripe Products** ⏸️ (Blocked - Need live site first)
+   - [ ] Switch Stripe to Live Mode (requires website verification)
    - [ ] Create Pro Monthly product ($10/month)
    - [ ] Create Pro Annual product ($100/year)
    - [ ] Note down production price IDs
    - [ ] Save production API keys (publishable & secret)
+   - **Prerequisite**: Complete Phase A deployment first
 
 2. **Security Review** ✅
    - [x] Review all API endpoints for authentication ✅ All endpoints properly authenticated
@@ -53,6 +57,11 @@ This document outlines our upcoming priorities and implementation steps.
 
 **Goal**: Get the application live with a public URL
 
+**Strategy**: Deploy with TEST mode Stripe keys initially. This allows:
+- Stripe to verify your live website (required for production activation)
+- You to test everything in production environment safely
+- No real payments until you switch to live keys
+
 #### Tasks:
 1. **Choose Hosting Platform**
    - [ ] Decision: Vercel vs Netlify vs other
@@ -60,10 +69,11 @@ This document outlines our upcoming priorities and implementation steps.
    - [ ] Configure custom domain (if applicable)
 
 2. **Environment Configuration**
-   - [ ] Set up production environment variables
+   - [ ] Set up production environment variables (see PRODUCTION_SETUP.md)
    - [ ] Configure Supabase production settings
-   - [ ] Set production Stripe keys
-   - [ ] Configure production webhook secret (temporary)
+   - [ ] Set Stripe TEST mode keys initially (pk_test_, sk_test_)
+   - [ ] Configure test webhook secret (we'll update to live keys after Stripe approval)
+   - [ ] Verify all environment variables are set correctly
 
 3. **Deploy Application**
    - [ ] Initial deployment
@@ -76,19 +86,38 @@ This document outlines our upcoming priorities and implementation steps.
    - [ ] Verify domain is accessible
    - [ ] Test HTTPS enforcement
 
+5. **Stripe Account Activation**
+   - [ ] Submit live website URL to Stripe Dashboard (Settings → Account → Website)
+   - [ ] Complete any required business verification documents
+   - [ ] Wait for Stripe approval email (typically 1-2 business days)
+   - [ ] Once approved, return to Phase C to create production products
+
 ---
 
 ### Phase C (Continued): Finalize Production Billing (10% Online)
 
 **Goal**: Complete billing setup that requires live URL
 
+**Prerequisites**:
+- Site deployed and live (Phase A complete)
+- Stripe account activated for live mode
+
 #### Tasks:
-1. **Configure Production Webhooks**
+1. **Create Production Stripe Products** (from Phase C step 1)
+   - [ ] Switch Stripe to Live Mode (should now be available)
+   - [ ] Create Pro Monthly product ($10/month)
+   - [ ] Create Pro Annual product ($100/year)
+   - [ ] Note down production price IDs
+   - [ ] Save production API keys (pk_live_, sk_live_)
+   - [ ] Update environment variables with live keys
+   - [ ] Redeploy application
+
+2. **Configure Production Webhooks**
    - [ ] Add webhook endpoint in Stripe Dashboard: `https://yourdomain.com/api/stripe/webhook`
    - [ ] Update production webhook secret in environment variables
    - [ ] Redeploy with new webhook secret
 
-2. **End-to-End Production Testing**
+3. **End-to-End Production Testing**
    - [ ] Create test account on production
    - [ ] Complete full upgrade flow with real card (then cancel)
    - [ ] Verify webhook events are received
@@ -97,12 +126,12 @@ This document outlines our upcoming priorities and implementation steps.
    - [ ] Test subscription management (update payment, cancel)
    - [ ] Verify usage limits work correctly
 
-3. **Monitoring Setup**
+4. **Monitoring Setup**
    - [ ] Set up Stripe webhook monitoring
    - [ ] Configure error alerting
    - [ ] Set up logging for critical paths
 
-4. **Final Verification**
+5. **Final Verification**
    - [ ] Test all pricing tiers
    - [ ] Verify usage resets work
    - [ ] Test export limits
