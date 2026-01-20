@@ -22,12 +22,19 @@ export default function ExportDrawer({ isOpen, onClose }: ExportDrawerProps) {
 
   // Set default date range (last 30 days)
   useEffect(() => {
+    const formatLocalDate = (date: Date): string => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
     const today = new Date();
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(today.getDate() - 30);
 
-    setEndDate(today.toISOString().split('T')[0]);
-    setStartDate(thirtyDaysAgo.toISOString().split('T')[0]);
+    setEndDate(formatLocalDate(today));
+    setStartDate(formatLocalDate(thirtyDaysAgo));
   }, []);
 
   // Fetch subscription when drawer opens

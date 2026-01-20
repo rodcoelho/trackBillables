@@ -11,7 +11,10 @@ interface AddBillableFormProps {
 export default function AddBillableForm({ onSuccess }: AddBillableFormProps) {
   const [date, setDate] = useState(() => {
     const today = new Date();
-    return today.toISOString().split('T')[0];
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   });
   const [client, setClient] = useState('');
   const [matter, setMatter] = useState('');
@@ -68,35 +71,45 @@ export default function AddBillableForm({ onSuccess }: AddBillableFormProps) {
     setError(null);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        throw new Error('Not authenticated');
-      }
-
-      const { error: insertError } = await supabase.from('billables').insert({
-        user_id: user.id,
-        date,
-        client,
-        matter,
-        time_amount: parseFloat(timeAmount),
-        description: description || null,
+      const response = await fetch('/api/billables', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          date,
+          client,
+          matter,
+          time_amount: parseFloat(timeAmount),
+          description: description || null,
+        }),
       });
 
-      if (insertError) throw insertError;
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Check if it's an upgrade error
+        if (data.upgrade) {
+          setShowUpgradePrompt(true);
+          throw new Error(data.message);
+        }
+        throw new Error(data.error || 'Failed to add billable');
+      }
 
       // Reset form
       setClient('');
       setMatter('');
       setTimeAmount('');
       setDescription('');
-      setDate(new Date().toISOString().split('T')[0]);
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      setDate(`${year}-${month}-${day}`);
 
       // Refresh subscription to update count
-      const response = await fetch('/api/subscription');
-      if (response.ok) {
-        const data = await response.json();
-        setSubscription(data);
+      const subResponse = await fetch('/api/subscription');
+      if (subResponse.ok) {
+        const subData = await subResponse.json();
+        setSubscription(subData);
       }
 
       if (onSuccess) {
@@ -308,10 +321,10 @@ function UpgradeModal({ onClose, message }: { onClose: () => void; message: stri
               <div className="flex justify-between items-center mb-2">
                 <div className="text-left">
                   <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                    $5<span className="text-sm font-normal">/month</span>
+                    $10<span className="text-sm font-normal">/month</span>
                   </div>
                   <div className="text-xs text-indigo-600 dark:text-indigo-400">
-                    ✨ 14-day free trial
+                    Billed monthly
                   </div>
                 </div>
                 <button
@@ -326,16 +339,16 @@ function UpgradeModal({ onClose, message }: { onClose: () => void; message: stri
             <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border-2 border-green-500 relative">
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                 <span className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                  BEST VALUE
+                  SAVE 20%
                 </span>
               </div>
               <div className="flex justify-between items-center mb-2">
                 <div className="text-left">
                   <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    $50<span className="text-sm font-normal">/year</span>
+                    $100<span className="text-sm font-normal">/year</span>
                   </div>
                   <div className="text-xs text-green-600 dark:text-green-400">
-                    Save $10 • 14-day free trial
+                    $8.33/month • Save $20
                   </div>
                 </div>
                 <button
