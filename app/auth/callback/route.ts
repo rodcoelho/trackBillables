@@ -14,7 +14,7 @@ export async function GET(request: Request) {
       if (next.startsWith('/admin')) {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-          const { data: isAdmin } = await supabase.rpc('is_admin', { user_uuid: user.id });
+          const { data: isAdmin } = await (supabase.rpc as any)('is_admin', { user_uuid: user.id });
 
           // If not an admin, redirect to admin login with error
           if (!isAdmin) {

@@ -68,7 +68,7 @@ export async function updateSession(request: NextRequest) {
       }
 
       // Check if user is an admin
-      const { data: isAdmin } = await supabase.rpc('is_admin', { user_uuid: user.id });
+      const { data: isAdmin } = await (supabase.rpc as any)('is_admin', { user_uuid: user.id });
 
       if (!isAdmin) {
         // Not an admin, redirect to dashboard
@@ -77,7 +77,7 @@ export async function updateSession(request: NextRequest) {
     } else {
       // If already authenticated and on admin login page, check if admin and redirect
       if (user) {
-        const { data: isAdmin } = await supabase.rpc('is_admin', { user_uuid: user.id });
+        const { data: isAdmin } = await (supabase.rpc as any)('is_admin', { user_uuid: user.id });
         if (isAdmin) {
           return NextResponse.redirect(new URL('/admin/dashboard', request.url));
         }

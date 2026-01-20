@@ -27,7 +27,7 @@ export default function AdminLoginPage() {
 
       if (user) {
         // Check if user is admin
-        const { data: isAdmin } = await supabase.rpc('is_admin', { user_uuid: user.id });
+        const { data: isAdmin } = await (supabase.rpc as any)('is_admin', { user_uuid: user.id });
 
         if (isAdmin) {
           router.push('/admin/dashboard');

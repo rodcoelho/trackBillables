@@ -27,7 +27,7 @@ export default function AdminLayout({
       }
 
       // Check if user is admin
-      const { data: adminCheck } = await supabase.rpc('is_admin', { user_uuid: user.id });
+      const { data: adminCheck } = await (supabase.rpc as any)('is_admin', { user_uuid: user.id });
 
       if (!adminCheck) {
         router.push('/dashboard');

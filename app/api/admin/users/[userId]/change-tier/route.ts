@@ -33,7 +33,7 @@ export async function POST(
       .from('auth.users')
       .select('email')
       .eq('id', userId)
-      .single();
+      .single() as { data: { email: string } | null, error: any };
 
     if (userError || !user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -44,11 +44,11 @@ export async function POST(
       .from('subscriptions')
       .select('tier')
       .eq('user_id', userId)
-      .single();
+      .single() as { data: { tier: string } | null };
 
     // Update tier
-    const { data: subscription, error: updateError } = await adminClient
-      .from('subscriptions')
+    const { data: subscription, error: updateError } = await (adminClient
+      .from('subscriptions') as any)
       .update({
         tier,
         updated_at: new Date().toISOString(),

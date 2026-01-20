@@ -48,7 +48,7 @@ export async function GET(request: Request) {
     query = query.order('created_at', { ascending: false }).range(from, to);
 
     // Execute query
-    const { data: logs, error: logsError, count: totalLogs } = await query;
+    const { data: logs, error: logsError, count: totalLogs } = await query as { data: Array<{ id: string, admin_user_id: string, action: string, target_user_id: string | null, notes: string | null, details: any, created_at: string }> | null, error: any, count: number | null };
 
     if (logsError) {
       console.error('Error fetching audit logs:', logsError);

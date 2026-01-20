@@ -100,6 +100,14 @@ export interface Database {
         };
       };
     };
+    Functions: {
+      is_admin: {
+        Args: {
+          user_uuid: string;
+        };
+        Returns: boolean;
+      };
+    };
   };
 }
 

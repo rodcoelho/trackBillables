@@ -50,7 +50,7 @@ export async function POST(
       .from('auth.users')
       .select('email')
       .eq('id', userId)
-      .single();
+      .single() as { data: { email: string } | null, error: any };
 
     if (userError || !user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -61,7 +61,7 @@ export async function POST(
       .from('subscriptions')
       .select('status, trial_end')
       .eq('user_id', userId)
-      .single();
+      .single() as { data: { status: string, trial_end: string | null } | null };
 
     // Check if user is currently trialing
     if (oldSubscription?.status !== 'trialing') {
@@ -74,8 +74,8 @@ export async function POST(
     }
 
     // Update trial_end
-    const { data: subscription, error: updateError } = await adminClient
-      .from('subscriptions')
+    const { data: subscription, error: updateError } = await (adminClient
+      .from('subscriptions') as any)
       .update({
         trial_end: trialEndDate.toISOString(),
         updated_at: new Date().toISOString(),

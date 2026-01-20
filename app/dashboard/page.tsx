@@ -8,10 +8,14 @@ import BillablesList, { BillablesListRef } from '@/components/BillablesList';
 import SignOutButton from '@/components/SignOutButton';
 import ExportDrawer from '@/components/ExportDrawer';
 import AnalyzeDrawer from '@/components/AnalyzeDrawer';
+import UpgradeBanner from '@/components/UpgradeBanner';
+import Link from 'next/link';
+import type { Subscription } from '@/types/database.types';
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isExportDrawerOpen, setIsExportDrawerOpen] = useState(false);
   const [isAnalyzeDrawerOpen, setIsAnalyzeDrawerOpen] = useState(false);
   const router = useRouter();
@@ -26,12 +30,25 @@ export default function DashboardPage() {
         router.push('/login');
       } else {
         setUser(user);
+        fetchSubscription();
         setLoading(false);
       }
     };
 
     checkUser();
   }, [router, supabase]);
+
+  const fetchSubscription = async () => {
+    try {
+      const response = await fetch('/api/subscription');
+      if (response.ok) {
+        const data = await response.json();
+        setSubscription(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch subscription:', err);
+    }
+  };
 
   const handleBillableAdded = () => {
     // Refresh the billables list
@@ -56,8 +73,24 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              TrackBillables
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+              <span>TrackBillables</span>
+              {subscription?.tier === 'pro' && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg">
+                  <svg
+                    className="w-4 h-4 mr-1.5"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  PRO
+                </span>
+              )}
             </h1>
           </div>
           <div className="flex gap-3">
@@ -79,9 +112,21 @@ export default function DashboardPage() {
               </svg>
               Export
             </button>
+            <Link
+              href="/billing"
+              className="px-4 py-2 bg-gray-600 text-white font-medium rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+              Billing
+            </Link>
             <SignOutButton />
           </div>
         </div>
+
+        {/* Upgrade Banner for Free Users */}
+        {subscription?.tier !== 'pro' && <UpgradeBanner />}
 
         {/* Add New Billable Form */}
         <div className="mb-8">

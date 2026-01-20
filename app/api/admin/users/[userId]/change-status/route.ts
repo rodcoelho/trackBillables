@@ -45,7 +45,7 @@ export async function POST(
       .from('auth.users')
       .select('email')
       .eq('id', userId)
-      .single();
+      .single() as { data: { email: string } | null, error: any };
 
     if (userError || !user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -56,11 +56,11 @@ export async function POST(
       .from('subscriptions')
       .select('status')
       .eq('user_id', userId)
-      .single();
+      .single() as { data: { status: string } | null };
 
     // Update status
-    const { data: subscription, error: updateError } = await adminClient
-      .from('subscriptions')
+    const { data: subscription, error: updateError } = await (adminClient
+      .from('subscriptions') as any)
       .update({
         status,
         updated_at: new Date().toISOString(),

@@ -38,7 +38,7 @@ export async function GET(request: Request) {
       // Fetch subscriptions
       const { data: subscriptions } = await adminClient
         .from('subscriptions')
-        .select('tier, status, canceled_at');
+        .select('tier, status, canceled_at') as { data: Array<{ tier: 'free' | 'pro', status: string, canceled_at: string | null }> | null };
 
       // Calculate user counts from fetched data
       const totalUsers = allUsers.length;
@@ -104,7 +104,7 @@ export async function GET(request: Request) {
     if (includeRevenue) {
       const { data: subscriptions } = await adminClient
         .from('subscriptions')
-        .select('tier, status, billing_interval');
+        .select('tier, status, billing_interval') as { data: Array<{ tier: 'free' | 'pro', status: string, billing_interval: 'month' | 'year' | null }> | null };
 
       // Calculate revenue metrics (simplified - assumes $10/month, $100/year)
       // TODO: Fetch actual prices from Stripe when implementing full integration
@@ -178,7 +178,7 @@ export async function GET(request: Request) {
         const { data: topUsersSubscriptions } = await adminClient
           .from('subscriptions')
           .select('user_id, tier, status')
-          .in('user_id', topUserIds);
+          .in('user_id', topUserIds) as { data: Array<{ user_id: string, tier: 'free' | 'pro', status: string }> | null };
 
         const subscriptionMap = new Map(
           topUsersSubscriptions?.map((s) => [s.user_id, s]) || []
