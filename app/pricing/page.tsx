@@ -6,6 +6,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
 import type { Subscription } from '@/types/database.types';
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic';
+
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
 
 export default function PricingPage() {

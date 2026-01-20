@@ -6,6 +6,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import type { Subscription } from '@/types/database.types';
 import Link from 'next/link';
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic';
+
 export default function BillingPage() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
@@ -186,7 +189,7 @@ export default function BillingPage() {
               {subscription.cancel_at_period_end && (
                 <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                   <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                    Your subscription will be canceled at the end of the current billing period. You'll still have access until {new Date(subscription.current_period_end).toLocaleDateString()}.
+                    Your subscription will be canceled at the end of the current billing period.{subscription.current_period_end && ` You'll still have access until ${new Date(subscription.current_period_end).toLocaleDateString()}.`}
                   </p>
                 </div>
               )}
