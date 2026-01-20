@@ -193,8 +193,6 @@ export default function LoginPage() {
         <div className="mt-6 text-center text-xs text-gray-500 dark:text-gray-400 space-x-3">
           <a href="/contact" className="hover:text-indigo-600 dark:hover:text-indigo-400">Contact</a>
           <span>•</span>
-          <a href="/refund-policy" className="hover:text-indigo-600 dark:hover:text-indigo-400">Refund Policy</a>
-          <span>•</span>
           <a href="/cancellation-policy" className="hover:text-indigo-600 dark:hover:text-indigo-400">Cancellation Policy</a>
         </div>
       </div>
