@@ -220,10 +220,19 @@ function PricingPageContent() {
           </div>
         </div>
 
-        <div className="mt-12 text-center">
-          <a href="/dashboard" className="text-indigo-600 dark:text-indigo-400 hover:underline">
-            ← Back to Dashboard
-          </a>
+        <div className="mt-12 text-center space-y-4">
+          <div>
+            <a href="/dashboard" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+              ← Back to Dashboard
+            </a>
+          </div>
+          <div className="text-xs text-gray-500 dark:text-gray-400 space-x-3">
+            <a href="/contact" className="hover:text-indigo-600 dark:hover:text-indigo-400">Contact</a>
+            <span>•</span>
+            <a href="/refund-policy" className="hover:text-indigo-600 dark:hover:text-indigo-400">Refund Policy</a>
+            <span>•</span>
+            <a href="/cancellation-policy" className="hover:text-indigo-600 dark:hover:text-indigo-400">Cancellation Policy</a>
+          </div>
         </div>
       </div>
     </div>
