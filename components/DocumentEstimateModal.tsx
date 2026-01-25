@@ -78,6 +78,7 @@ export default function DocumentEstimateModal({
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [showTypeSuggestions, setShowTypeSuggestions] = useState<number | null>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
@@ -462,20 +463,51 @@ export default function DocumentEstimateModal({
                                 <option value="high">High</option>
                               </select>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 relative">
                               <label className="text-xs font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
                                 Type
                               </label>
-                              <select
-                                value={effort.category || ''}
-                                onChange={(e) => updateFileEffort(index, effort.level, e.target.value)}
-                                className="px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white w-52"
-                              >
-                                <option value="">Optional...</option>
-                                {ALL_DOCUMENT_TYPES.map((cat) => (
-                                  <option key={cat} value={cat}>{cat}</option>
-                                ))}
-                              </select>
+                              <div className="relative w-52">
+                                <input
+                                  type="text"
+                                  value={effort.category || ''}
+                                  onChange={(e) => {
+                                    updateFileEffort(index, effort.level, e.target.value);
+                                    setShowTypeSuggestions(index);
+                                  }}
+                                  onFocus={() => setShowTypeSuggestions(index)}
+                                  onBlur={() => {
+                                    // Delay to allow click on suggestion
+                                    setTimeout(() => setShowTypeSuggestions(null), 200);
+                                  }}
+                                  placeholder="Optional..."
+                                  className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                                />
+                                {showTypeSuggestions === index && (() => {
+                                  const searchTerm = (effort.category || '').toLowerCase();
+                                  const filteredTypes = ALL_DOCUMENT_TYPES.filter(type =>
+                                    type.toLowerCase().includes(searchTerm)
+                                  );
+                                  return filteredTypes.length > 0 && (
+                                    <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                                      {filteredTypes.map((type) => (
+                                        <button
+                                          key={type}
+                                          type="button"
+                                          onMouseDown={(e) => {
+                                            e.preventDefault();
+                                            updateFileEffort(index, effort.level, type);
+                                            setShowTypeSuggestions(null);
+                                          }}
+                                          className="w-full text-left px-3 py-2 text-xs hover:bg-purple-50 dark:hover:bg-purple-900/20 text-gray-900 dark:text-white"
+                                        >
+                                          {type}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  );
+                                })()}
+                              </div>
                             </div>
                           </div>
                         )}
