@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { Subscription } from '@/types/database.types';
 
@@ -31,6 +31,7 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const [showAiDropdown, setShowAiDropdown] = useState(false);
   const supabase = createClient();
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
 
   // Update form when prefilled values change (from email estimate)
   useEffect(() => {
@@ -41,6 +42,18 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
       setDescription(prefilledDescription);
     }
   }, [prefilledHours, prefilledDescription]);
+
+  // Auto-resize description textarea
+  useEffect(() => {
+    const textarea = descriptionRef.current;
+    if (textarea) {
+      // Reset height to auto to get the correct scrollHeight
+      textarea.style.height = 'auto';
+      // Set new height based on content, with min and max constraints
+      const newHeight = Math.min(Math.max(textarea.scrollHeight, 96), 288); // 96px = 4 rows, 288px = 12 rows (3x)
+      textarea.style.height = `${newHeight}px`;
+    }
+  }, [description]);
 
   // Fetch subscription on mount
   useEffect(() => {
@@ -257,12 +270,13 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
               Description
             </label>
             <textarea
+              ref={descriptionRef}
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={4}
               placeholder="Detailed notes about the work performed..."
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white resize-none"
+              style={{ minHeight: '96px', maxHeight: '288px' }}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white resize-none overflow-y-auto"
             />
           </div>
 
