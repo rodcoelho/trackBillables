@@ -80,28 +80,38 @@ export async function POST(request: Request) {
     console.log('Email chain length:', email_chain.length);
 
     // Construct the prompt for Claude
-    const prompt = `You are an experienced attorney specializing in billing practices for legal work, particularly email correspondence involving document review and responses. Your task is to analyze the provided email chain and estimate the billable time for handling it, assuming a standard hourly billing model with 0.1-hour (6-minute) increments and a minimum of 0.1 hours per interaction.
+    const prompt = `You are an experienced attorney specializing in billing practices for legal work. Your task is to analyze an email chain and estimate billable time based on the attorney's actual work.
 
-Consider time spent on:
-- Reading and reviewing incoming emails and any attached documents (estimate based on length and complexity: e.g., short email = 2-5 minutes, detailed with docs = 10-20 minutes).
-- Analyzing legal implications, researching if implied, and strategizing responses.
-- Drafting and sending outgoing responses (e.g., quick reply = 3-5 minutes, substantive = 10-15 minutes).
-- Any back-and-forth exchanges in the chain, counting only the attorney's side (reviewing received messages and preparing responses).
+CRITICAL INSTRUCTIONS:
+1. First, verify this is legal correspondence. If the emails are personal, customer service, shopping, or non-legal matters, return 0.0 hours with an appropriate description.
+2. Count ONLY emails FROM the attorney's email address: ${attorney_email}
+3. For EACH attorney email, analyze the actual content, length, and complexity
+4. Do NOT use generic estimates - examine what was actually written
 
-Do not include non-billable time like administrative tasks. Round up to the nearest 0.1 hour per task and sum for the total chain.
+ANALYSIS STEPS:
+1. Identify all emails FROM ${attorney_email}
+2. For each attorney email, estimate time based on:
+   - Length: Quick reply (1-2 sentences) = 0.1 hours, Medium (1-2 paragraphs) = 0.2 hours, Long/detailed = 0.3+ hours
+   - Complexity: Simple acknowledgment = 0.1 hours, Legal analysis/advice = 0.3-0.5 hours, Complex research/strategy = 0.5+ hours
+   - Reading incoming messages before responding: Brief = add 0.1 hours, Detailed with attachments = add 0.2-0.3 hours
 
-The attorney's email address is: ${attorney_email}
+3. Sum the total time for all attorney emails
 
-Only count time for emails FROM this attorney. Do not count time for emails TO this attorney (those are client emails).
+BILLING RULES:
+- Use 0.1-hour (6-minute) increments
+- Minimum 0.1 hours per email response
+- Do not bill for emails TO the attorney (client emails)
+- Do not include administrative tasks
 
-Email chain:
+Email chain to analyze:
 ${email_chain}
 
-Output exactly in this JSON format with no additional text, explanations, markdown, or preamble:
+IMPORTANT: Your description must reference the actual content and dates from the emails above. Do NOT use generic placeholder text. Describe what the attorney actually did (e.g., "Reviewed client's contract question email (0.1 hours); drafted response with initial legal analysis of indemnification clause (0.3 hours)").
 
+Output format (JSON only, no markdown):
 {
-  "billable_hours": 0.8,
-  "description": "Reviewed initial email and attached documents (0.3 hours); drafted and sent first response (0.2 hours); reviewed second incoming message and prepared reply (0.3 hours)."
+  "billable_hours": [calculated total],
+  "description": "[Specific description of actual work performed with times]"
 }`;
 
     // Call Claude API with Haiku model
