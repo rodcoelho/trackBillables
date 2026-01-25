@@ -85,10 +85,10 @@ export default function DocumentEstimateModal({
     setFiles(selectedFiles);
     setError(null);
 
-    // Initialize file efforts for simple mode (no default category)
+    // Initialize file efforts for simple mode (default to medium, no default category)
     const newEfforts = new Map<number, FileEffort>();
     selectedFiles.forEach((_, index) => {
-      newEfforts.set(index, { level: 'low', category: '' });
+      newEfforts.set(index, { level: 'medium', category: '' });
     });
     setFileEfforts(newEfforts);
 
@@ -125,7 +125,7 @@ export default function DocumentEstimateModal({
       if (oldEffort) {
         newEfforts.set(i, oldEffort);
       } else {
-        newEfforts.set(i, { level: 'low', category: '' });
+        newEfforts.set(i, { level: 'medium', category: '' });
       }
     });
     setFileEfforts(newEfforts);
@@ -397,17 +397,18 @@ export default function DocumentEstimateModal({
               </div>
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {files.map((file, index) => {
-                  const effort = fileEfforts.get(index) || { level: 'low', category: '' };
+                  const effort = fileEfforts.get(index) || { level: 'medium', category: '' };
                   const metadata = fileMetadata.get(index) || {};
 
                   return (
                     <div
                       key={index}
-                      className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg space-y-3"
+                      className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg"
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <svg className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="flex items-start gap-3">
+                        {/* File Info - Left Side */}
+                        <div className="flex items-start gap-3 flex-1 min-w-0">
+                          <svg className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
                           <div className="flex-1 min-w-0">
@@ -422,56 +423,58 @@ export default function DocumentEstimateModal({
                             </p>
                           </div>
                         </div>
+
+                        {/* Effort Selection - Right Side (only in Simple Mode) */}
+                        {analysisMode === 'simple' && (
+                          <div className="flex flex-col gap-2 w-48 flex-shrink-0">
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Effort <span className="text-red-500">*</span>
+                              </label>
+                              <select
+                                value={effort.level}
+                                onChange={(e) => {
+                                  const newLevel = e.target.value as EffortLevel;
+                                  // Keep existing category if it's valid for the new level, otherwise clear it
+                                  const validCategories = EFFORT_CATEGORIES[newLevel];
+                                  const newCategory = validCategories.includes(effort.category || '') ? effort.category : '';
+                                  updateFileEffort(index, newLevel, newCategory || '');
+                                }}
+                                className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                              >
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Type
+                              </label>
+                              <select
+                                value={effort.category || ''}
+                                onChange={(e) => updateFileEffort(index, effort.level, e.target.value)}
+                                className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                              >
+                                <option value="">Optional...</option>
+                                {EFFORT_CATEGORIES[effort.level].map((cat) => (
+                                  <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Delete Button */}
                         <button
                           onClick={() => removeFile(index)}
-                          className="ml-3 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+                          className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 flex-shrink-0"
                         >
                           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                           </svg>
                         </button>
                       </div>
-
-                      {/* Effort Selection for Simple Mode */}
-                      {analysisMode === 'simple' && (
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                              Effort Level <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                              value={effort.level}
-                              onChange={(e) => {
-                                const newLevel = e.target.value as EffortLevel;
-                                // Keep existing category if it's valid for the new level, otherwise clear it
-                                const validCategories = EFFORT_CATEGORIES[newLevel];
-                                const newCategory = validCategories.includes(effort.category || '') ? effort.category : '';
-                                updateFileEffort(index, newLevel, newCategory || '');
-                              }}
-                              className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                            >
-                              <option value="low">Low</option>
-                              <option value="medium">Medium</option>
-                              <option value="high">High</option>
-                            </select>
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                              Document Type (Optional)
-                            </label>
-                            <select
-                              value={effort.category || ''}
-                              onChange={(e) => updateFileEffort(index, effort.level, e.target.value)}
-                              className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                            >
-                              <option value="">Select type...</option>
-                              {EFFORT_CATEGORIES[effort.level].map((cat) => (
-                                <option key={cat} value={cat}>{cat}</option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   );
                 })}
