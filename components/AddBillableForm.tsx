@@ -8,9 +8,11 @@ interface AddBillableFormProps {
   onSuccess?: () => void;
   prefilledHours?: number;
   prefilledDescription?: string;
+  onEmailEstimateClick?: () => void;
+  showEmailEstimate?: boolean;
 }
 
-export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDescription }: AddBillableFormProps) {
+export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDescription, onEmailEstimateClick, showEmailEstimate }: AddBillableFormProps) {
   const [date, setDate] = useState(() => {
     const today = new Date();
     const year = today.getFullYear();
@@ -262,11 +264,23 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
             />
           </div>
 
-          <div>
+          <div className="flex gap-3">
+            {showEmailEstimate && (
+              <button
+                type="button"
+                onClick={onEmailEstimateClick}
+                className="px-4 py-3 bg-purple-600 text-white font-medium rounded-md shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                Email Estimate
+              </button>
+            )}
             <button
               type="submit"
               disabled={saving || !client || !matter || !timeAmount || parseFloat(timeAmount) <= 0 || parseFloat(timeAmount) > 24}
-              className="w-full px-4 py-3 bg-indigo-600 text-white font-medium rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 px-4 py-3 bg-indigo-600 text-white font-medium rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {saving ? 'Adding...' : 'Add Billable Entry'}
             </button>

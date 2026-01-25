@@ -115,17 +115,6 @@ export default function DashboardPage() {
               </svg>
               Analyze
             </button>
-            {subscription?.tier === 'pro' && ['active', 'trialing'].includes(subscription.status) && (
-              <button
-                onClick={() => setIsEmailEstimateOpen(true)}
-                className="px-4 py-2 bg-purple-600 text-white font-medium rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors flex items-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                Email Estimate
-              </button>
-            )}
             <button
               onClick={() => setIsExportDrawerOpen(true)}
               className="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors flex items-center gap-2"
@@ -148,6 +137,8 @@ export default function DashboardPage() {
             onSuccess={handleBillableAdded}
             prefilledHours={prefilledHours}
             prefilledDescription={prefilledDescription}
+            onEmailEstimateClick={() => setIsEmailEstimateOpen(true)}
+            showEmailEstimate={subscription?.tier === 'pro' && ['active', 'trialing'].includes(subscription.status)}
           />
         </div>
 
