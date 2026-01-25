@@ -4,6 +4,7 @@ import { useEffect, useState, forwardRef, useImperativeHandle, useRef, useCallba
 import { createClient } from '@/lib/supabase/client';
 import { Billable } from '@/types/database.types';
 import BillableItem from './BillableItem';
+import DuplicateEntryModal from './DuplicateEntryModal';
 
 export interface BillablesListRef {
   refresh: () => Promise<void>;
@@ -18,6 +19,8 @@ const BillablesList = forwardRef<BillablesListRef>((props, ref) => {
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(0);
+  const [duplicateModalOpen, setDuplicateModalOpen] = useState(false);
+  const [billableToDuplicate, setBillableToDuplicate] = useState<Billable | null>(null);
   const supabase = createClient();
   const observerTarget = useRef<HTMLDivElement>(null);
   const isLoadingRef = useRef(false);
@@ -172,6 +175,18 @@ const BillablesList = forwardRef<BillablesListRef>((props, ref) => {
     }
   };
 
+  const handleDuplicate = (billable: Billable) => {
+    setBillableToDuplicate(billable);
+    setDuplicateModalOpen(true);
+  };
+
+  const handleDuplicateSuccess = () => {
+    // Refresh the list after successful duplicate
+    setPage(0);
+    setHasMore(true);
+    fetchBillables(0, false);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -199,10 +214,16 @@ const BillablesList = forwardRef<BillablesListRef>((props, ref) => {
   }
 
   return (
-    <div className="space-y-3">
-      {billables.map((billable) => (
-        <BillableItem key={billable.id} billable={billable} onDelete={handleDelete} />
-      ))}
+    <>
+      <div className="space-y-3">
+        {billables.map((billable) => (
+          <BillableItem
+            key={billable.id}
+            billable={billable}
+            onDelete={handleDelete}
+            onDuplicate={handleDuplicate}
+          />
+        ))}
 
       {/* Intersection observer target for infinite scroll */}
       {hasMore && (
@@ -216,13 +237,26 @@ const BillablesList = forwardRef<BillablesListRef>((props, ref) => {
         </div>
       )}
 
-      {/* Show message when all items are loaded */}
-      {!hasMore && billables.length > PAGE_SIZE && (
-        <div className="py-4 text-center text-sm text-gray-500 dark:text-gray-400">
-          All entries loaded ({billables.length} total)
-        </div>
+        {/* Show message when all items are loaded */}
+        {!hasMore && billables.length > PAGE_SIZE && (
+          <div className="py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+            All entries loaded ({billables.length} total)
+          </div>
+        )}
+      </div>
+
+      {/* Duplicate Entry Modal */}
+      {duplicateModalOpen && billableToDuplicate && (
+        <DuplicateEntryModal
+          billable={billableToDuplicate}
+          onClose={() => {
+            setDuplicateModalOpen(false);
+            setBillableToDuplicate(null);
+          }}
+          onSuccess={handleDuplicateSuccess}
+        />
       )}
-    </div>
+    </>
   );
 });
 
