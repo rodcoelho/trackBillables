@@ -426,9 +426,9 @@ export default function DocumentEstimateModal({
 
                         {/* Effort Selection - Right Side (only in Simple Mode) */}
                         {analysisMode === 'simple' && (
-                          <div className="flex flex-col gap-2 w-48 flex-shrink-0">
-                            <div>
-                              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          <div className="flex flex-col gap-2 flex-shrink-0">
+                            <div className="flex items-center gap-2">
+                              <label className="text-xs font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
                                 Effort <span className="text-red-500">*</span>
                               </label>
                               <select
@@ -440,21 +440,21 @@ export default function DocumentEstimateModal({
                                   const newCategory = validCategories.includes(effort.category || '') ? effort.category : '';
                                   updateFileEffort(index, newLevel, newCategory || '');
                                 }}
-                                className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                                className="px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white w-28"
                               >
                                 <option value="low">Low</option>
                                 <option value="medium">Medium</option>
                                 <option value="high">High</option>
                               </select>
                             </div>
-                            <div>
-                              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <div className="flex items-center gap-2">
+                              <label className="text-xs font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
                                 Type
                               </label>
                               <select
                                 value={effort.category || ''}
                                 onChange={(e) => updateFileEffort(index, effort.level, e.target.value)}
-                                className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                                className="px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white w-28"
                               >
                                 <option value="">Optional...</option>
                                 {EFFORT_CATEGORIES[effort.level].map((cat) => (
