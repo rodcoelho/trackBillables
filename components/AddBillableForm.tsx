@@ -6,9 +6,11 @@ import type { Subscription } from '@/types/database.types';
 
 interface AddBillableFormProps {
   onSuccess?: () => void;
+  prefilledHours?: number;
+  prefilledDescription?: string;
 }
 
-export default function AddBillableForm({ onSuccess }: AddBillableFormProps) {
+export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDescription }: AddBillableFormProps) {
   const [date, setDate] = useState(() => {
     const today = new Date();
     const year = today.getFullYear();
@@ -25,6 +27,16 @@ export default function AddBillableForm({ onSuccess }: AddBillableFormProps) {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const supabase = createClient();
+
+  // Update form when prefilled values change (from email estimate)
+  useEffect(() => {
+    if (prefilledHours !== undefined) {
+      setTimeAmount(prefilledHours.toString());
+    }
+    if (prefilledDescription !== undefined) {
+      setDescription(prefilledDescription);
+    }
+  }, [prefilledHours, prefilledDescription]);
 
   // Fetch subscription on mount
   useEffect(() => {

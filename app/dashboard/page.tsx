@@ -9,6 +9,7 @@ import ExportDrawer from '@/components/ExportDrawer';
 import AnalyzeDrawer from '@/components/AnalyzeDrawer';
 import UpgradeBanner from '@/components/UpgradeBanner';
 import UserMenu from '@/components/UserMenu';
+import EmailEstimateModal from '@/components/EmailEstimateModal';
 import type { Subscription } from '@/types/database.types';
 
 export default function DashboardPage() {
@@ -17,6 +18,9 @@ export default function DashboardPage() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isExportDrawerOpen, setIsExportDrawerOpen] = useState(false);
   const [isAnalyzeDrawerOpen, setIsAnalyzeDrawerOpen] = useState(false);
+  const [isEmailEstimateOpen, setIsEmailEstimateOpen] = useState(false);
+  const [prefilledHours, setPrefilledHours] = useState<number | undefined>(undefined);
+  const [prefilledDescription, setPrefilledDescription] = useState<string | undefined>(undefined);
   const router = useRouter();
   const supabase = createClient();
   const billablesListRef = useRef<BillablesListRef>(null);
@@ -52,6 +56,15 @@ export default function DashboardPage() {
   const handleBillableAdded = () => {
     // Refresh the billables list
     billablesListRef.current?.refresh();
+    // Clear prefilled values after successful add
+    setPrefilledHours(undefined);
+    setPrefilledDescription(undefined);
+  };
+
+  const handleEstimateGenerated = (hours: number, description: string) => {
+    // Set the prefilled values
+    setPrefilledHours(hours);
+    setPrefilledDescription(description);
   };
 
   if (loading) {
@@ -102,6 +115,17 @@ export default function DashboardPage() {
               </svg>
               Analyze
             </button>
+            {subscription?.tier === 'pro' && ['active', 'trialing'].includes(subscription.status) && (
+              <button
+                onClick={() => setIsEmailEstimateOpen(true)}
+                className="px-4 py-2 bg-purple-600 text-white font-medium rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                Email Estimate
+              </button>
+            )}
             <button
               onClick={() => setIsExportDrawerOpen(true)}
               className="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors flex items-center gap-2"
@@ -120,7 +144,11 @@ export default function DashboardPage() {
 
         {/* Add New Billable Form */}
         <div className="mb-8">
-          <AddBillableForm onSuccess={handleBillableAdded} />
+          <AddBillableForm
+            onSuccess={handleBillableAdded}
+            prefilledHours={prefilledHours}
+            prefilledDescription={prefilledDescription}
+          />
         </div>
 
         {/* Billables List */}
@@ -136,6 +164,14 @@ export default function DashboardPage() {
       <AnalyzeDrawer
         isOpen={isAnalyzeDrawerOpen}
         onClose={() => setIsAnalyzeDrawerOpen(false)}
+      />
+
+      {/* Email Estimate Modal */}
+      <EmailEstimateModal
+        isOpen={isEmailEstimateOpen}
+        onClose={() => setIsEmailEstimateOpen(false)}
+        onEstimateGenerated={handleEstimateGenerated}
+        subscription={subscription}
       />
 
       {/* Export Drawer */}

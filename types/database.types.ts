@@ -55,6 +55,7 @@ export interface Database {
           entries_count_current_month: number;
           exports_count_current_month: number;
           usage_reset_date: string;
+          attorney_email: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -97,6 +98,7 @@ export interface Database {
           entries_count_current_month?: number;
           exports_count_current_month?: number;
           usage_reset_date?: string;
+          attorney_email?: string | null;
         };
       };
     };
