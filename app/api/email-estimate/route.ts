@@ -123,13 +123,23 @@ Output exactly in this JSON format with no additional text, explanations, markdo
     const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
     console.log('Response text:', responseText);
 
+    // Strip markdown code blocks if present
+    let cleanedText = responseText.trim();
+    if (cleanedText.startsWith('```')) {
+      // Remove ```json or ``` from start
+      cleanedText = cleanedText.replace(/^```(?:json)?\n?/, '');
+      // Remove ``` from end
+      cleanedText = cleanedText.replace(/\n?```$/, '');
+      cleanedText = cleanedText.trim();
+    }
+
     // Parse JSON response
     let parsedResponse;
     try {
-      parsedResponse = JSON.parse(responseText);
+      parsedResponse = JSON.parse(cleanedText);
       console.log('Parsed response:', parsedResponse);
     } catch (parseError) {
-      console.error('Failed to parse Claude response:', responseText);
+      console.error('Failed to parse Claude response:', cleanedText);
       console.error('Parse error:', parseError);
       return NextResponse.json(
         { error: 'Failed to parse AI response. Please try again or enter manually.' },
