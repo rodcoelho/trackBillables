@@ -145,7 +145,7 @@ export default function DocumentEstimateModal({
               AI Document Estimate
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Upload up to 15 documents for AI-powered billable time estimation
+              Upload up to 15 documents (max 100 PDF pages total) for AI-powered billable time estimation
             </p>
           </div>
           <button
@@ -188,7 +188,7 @@ export default function DocumentEstimateModal({
                   <span className="font-semibold text-purple-600 dark:text-purple-400">Click to upload</span> or drag and drop
                 </p>
                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
-                  PDF, DOC, DOCX, TXT, RTF up to 5MB each (max 15 files)
+                  PDF, DOC, DOCX, TXT, RTF up to 5MB each (max 15 files, 100 PDF pages total)
                 </p>
               </label>
             </div>

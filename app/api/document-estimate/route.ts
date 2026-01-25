@@ -223,6 +223,19 @@ Output exactly in this JSON format with no additional text, explanations, markdo
     console.error('Document estimate error:', error);
     console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     console.error('Error message:', error instanceof Error ? error.message : String(error));
+
+    // Check for specific Anthropic API errors
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    // 100 page limit error
+    if (errorMessage.includes('maximum of 100 PDF pages')) {
+      return NextResponse.json(
+        { error: 'Total PDF pages exceed 100-page limit. Please upload fewer or smaller documents.' },
+        { status: 400 }
+      );
+    }
+
+    // Generic error
     return NextResponse.json(
       { error: 'Failed to generate estimate. Please try again or enter manually.' },
       { status: 500 }
