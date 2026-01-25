@@ -10,6 +10,39 @@ interface DocumentEstimateModalProps {
   subscription: Subscription | null;
 }
 
+type AnalysisMode = 'simple' | 'in-depth';
+
+type EffortLevel = 'low' | 'medium' | 'high';
+
+interface FileEffort {
+  level: EffortLevel;
+  category: string;
+}
+
+const EFFORT_CATEGORIES = {
+  low: [
+    'Brief Correspondence',
+    'Standard Form Document',
+    'Administrative Record',
+    'Other'
+  ],
+  medium: [
+    'Email Chain with Attachments',
+    'Contract or Agreement',
+    'Financial Statement',
+    'Discovery Response',
+    'Other'
+  ],
+  high: [
+    'Legal Brief or Motion',
+    'Deposition or Transcript',
+    'Technical Report',
+    'Complex Regulatory Filing',
+    'Research Memo or Opinion',
+    'Other'
+  ]
+};
+
 export default function DocumentEstimateModal({
   isOpen,
   onClose,
@@ -17,6 +50,8 @@ export default function DocumentEstimateModal({
   subscription,
 }: DocumentEstimateModalProps) {
   const [files, setFiles] = useState<File[]>([]);
+  const [analysisMode, setAnalysisMode] = useState<AnalysisMode>('simple');
+  const [fileEfforts, setFileEfforts] = useState<Map<number, FileEffort>>(new Map());
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showUpgrade, setShowUpgrade] = useState(false);
@@ -43,10 +78,36 @@ export default function DocumentEstimateModal({
 
     setFiles(selectedFiles);
     setError(null);
+
+    // Initialize file efforts for simple mode
+    const newEfforts = new Map<number, FileEffort>();
+    selectedFiles.forEach((_, index) => {
+      newEfforts.set(index, { level: 'low', category: EFFORT_CATEGORIES.low[0] });
+    });
+    setFileEfforts(newEfforts);
   };
 
   const removeFile = (index: number) => {
-    setFiles(files.filter((_, i) => i !== index));
+    const newFiles = files.filter((_, i) => i !== index);
+    setFiles(newFiles);
+
+    // Update efforts map
+    const newEfforts = new Map<number, FileEffort>();
+    newFiles.forEach((_, i) => {
+      const oldEffort = fileEfforts.get(i < index ? i : i + 1);
+      if (oldEffort) {
+        newEfforts.set(i, oldEffort);
+      } else {
+        newEfforts.set(i, { level: 'low', category: EFFORT_CATEGORIES.low[0] });
+      }
+    });
+    setFileEfforts(newEfforts);
+  };
+
+  const updateFileEffort = (index: number, level: EffortLevel, category: string) => {
+    const newEfforts = new Map(fileEfforts);
+    newEfforts.set(index, { level, category });
+    setFileEfforts(newEfforts);
   };
 
   const handleGenerate = async () => {
@@ -55,34 +116,78 @@ export default function DocumentEstimateModal({
       return;
     }
 
+    // In simple mode, validate that all files have effort selected
+    if (analysisMode === 'simple') {
+      const missingEffort = files.some((_, index) => !fileEfforts.has(index));
+      if (missingEffort) {
+        setError('Please select level of effort for all documents');
+        return;
+      }
+    }
+
     setGenerating(true);
     setError(null);
 
     try {
-      const formData = new FormData();
-      files.forEach((file) => {
-        formData.append('documents', file);
-      });
+      if (analysisMode === 'simple') {
+        // Simple mode: send metadata only
+        const fileMetadata = files.map((file, index) => {
+          const effort = fileEfforts.get(index)!;
+          return {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            level: effort.level,
+            category: effort.category,
+          };
+        });
 
-      const response = await fetch('/api/document-estimate', {
-        method: 'POST',
-        body: formData,
-      });
+        const response = await fetch('/api/document-estimate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            mode: 'simple',
+            files: fileMetadata,
+          }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (!response.ok) {
-        if (data.upgrade) {
-          setShowUpgrade(true);
+        if (!response.ok) {
+          if (data.upgrade) {
+            setShowUpgrade(true);
+          }
+          throw new Error(data.error || 'Failed to generate estimate');
         }
-        throw new Error(data.error || 'Failed to generate estimate');
-      }
 
-      // Success - pass the data to parent
-      onEstimateGenerated(data.billable_hours, data.description);
+        onEstimateGenerated(data.billable_hours, data.description);
+      } else {
+        // In-depth mode: send actual files
+        const formData = new FormData();
+        files.forEach((file) => {
+          formData.append('documents', file);
+        });
+
+        const response = await fetch('/api/document-estimate', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          if (data.upgrade) {
+            setShowUpgrade(true);
+          }
+          throw new Error(data.error || 'Failed to generate estimate');
+        }
+
+        onEstimateGenerated(data.billable_hours, data.description);
+      }
 
       // Reset and close
       setFiles([]);
+      setFileEfforts(new Map());
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate estimate');
@@ -166,6 +271,42 @@ export default function DocumentEstimateModal({
             </div>
           )}
 
+          {/* Analysis Mode Toggle */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Analysis Mode
+            </label>
+            <div className="inline-flex rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-1">
+              <button
+                type="button"
+                onClick={() => setAnalysisMode('simple')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  analysisMode === 'simple'
+                    ? 'bg-purple-600 text-white shadow-sm'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
+                }`}
+              >
+                Simple (Faster, Cheaper)
+              </button>
+              <button
+                type="button"
+                onClick={() => setAnalysisMode('in-depth')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  analysisMode === 'in-depth'
+                    ? 'bg-purple-600 text-white shadow-sm'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
+                }`}
+              >
+                In-Depth (AI Analysis)
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+              {analysisMode === 'simple'
+                ? 'Estimates based on file metadata and your selected effort level (~$0.003 per request)'
+                : 'AI reads and analyzes document content for accurate estimates (~$0.01-0.02 per request)'}
+            </p>
+          </div>
+
           {/* File Upload Area */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -194,7 +335,7 @@ export default function DocumentEstimateModal({
             </div>
           </div>
 
-          {/* File List */}
+          {/* File List with Effort Selection */}
           {files.length > 0 && (
             <div className="space-y-2">
               <div className="flex justify-between items-center">
@@ -202,41 +343,87 @@ export default function DocumentEstimateModal({
                   Selected Documents ({files.length}/15)
                 </p>
                 <button
-                  onClick={() => setFiles([])}
+                  onClick={() => {
+                    setFiles([]);
+                    setFileEfforts(new Map());
+                  }}
                   className="text-sm text-red-600 dark:text-red-400 hover:underline"
                 >
                   Clear All
                 </button>
               </div>
-              <div className="space-y-2 max-h-60 overflow-y-auto">
-                {files.map((file, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded-lg"
-                  >
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <svg className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                          {file.name}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {formatFileSize(file.size)}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => removeFile(index)}
-                      className="ml-3 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {files.map((file, index) => {
+                  const effort = fileEfforts.get(index) || { level: 'low', category: EFFORT_CATEGORIES.low[0] };
+
+                  return (
+                    <div
+                      key={index}
+                      className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg space-y-3"
                     >
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <svg className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                              {file.name}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {formatFileSize(file.size)}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => removeFile(index)}
+                          className="ml-3 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+                        >
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      {/* Effort Selection for Simple Mode */}
+                      {analysisMode === 'simple' && (
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Effort Level
+                            </label>
+                            <select
+                              value={effort.level}
+                              onChange={(e) => {
+                                const newLevel = e.target.value as EffortLevel;
+                                updateFileEffort(index, newLevel, EFFORT_CATEGORIES[newLevel][0]);
+                              }}
+                              className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                            >
+                              <option value="low">Low</option>
+                              <option value="medium">Medium</option>
+                              <option value="high">High</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Document Type
+                            </label>
+                            <select
+                              value={effort.category}
+                              onChange={(e) => updateFileEffort(index, effort.level, e.target.value)}
+                              className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                            >
+                              {EFFORT_CATEGORIES[effort.level].map((cat) => (
+                                <option key={cat} value={cat}>{cat}</option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -249,12 +436,21 @@ export default function DocumentEstimateModal({
               </svg>
               How It Works
             </h3>
-            <ul className="text-sm text-purple-800 dark:text-purple-300 space-y-1">
-              <li>• AI analyzes document length, complexity, and content</li>
-              <li>• Estimates time for reading, reviewing, and legal analysis</li>
-              <li>• Rounds to 0.1-hour (6-minute) increments</li>
-              <li>• Returns total billable hours with detailed breakdown</li>
-            </ul>
+            {analysisMode === 'simple' ? (
+              <ul className="text-sm text-purple-800 dark:text-purple-300 space-y-1">
+                <li>• Estimates based on file metadata and your selected effort level</li>
+                <li>• Much faster and cheaper than in-depth analysis</li>
+                <li>• Best for routine documents with predictable review times</li>
+                <li>• Returns total billable hours with detailed breakdown</li>
+              </ul>
+            ) : (
+              <ul className="text-sm text-purple-800 dark:text-purple-300 space-y-1">
+                <li>• AI analyzes document length, complexity, and content</li>
+                <li>• Estimates time for reading, reviewing, and legal analysis</li>
+                <li>• Rounds to 0.1-hour (6-minute) increments</li>
+                <li>• Returns total billable hours with detailed breakdown</li>
+              </ul>
+            )}
           </div>
 
           {/* Action Buttons */}
