@@ -48,6 +48,23 @@ const EFFORT_CATEGORIES = {
   ]
 };
 
+// Combined list of all document types (for dropdown)
+const ALL_DOCUMENT_TYPES = [
+  'Brief Correspondence',
+  'Standard Form Document',
+  'Administrative Record',
+  'Email Chain with Attachments',
+  'Contract or Agreement',
+  'Financial Statement',
+  'Discovery Response',
+  'Legal Brief or Motion',
+  'Deposition or Transcript',
+  'Technical Report',
+  'Complex Regulatory Filing',
+  'Research Memo or Opinion',
+  'Other'
+];
+
 export default function DocumentEstimateModal({
   isOpen,
   onClose,
@@ -435,10 +452,8 @@ export default function DocumentEstimateModal({
                                 value={effort.level}
                                 onChange={(e) => {
                                   const newLevel = e.target.value as EffortLevel;
-                                  // Keep existing category if it's valid for the new level, otherwise clear it
-                                  const validCategories = EFFORT_CATEGORIES[newLevel];
-                                  const newCategory = validCategories.includes(effort.category || '') ? effort.category : '';
-                                  updateFileEffort(index, newLevel, newCategory || '');
+                                  // Keep existing category when changing effort level
+                                  updateFileEffort(index, newLevel, effort.category || '');
                                 }}
                                 className="px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white w-28"
                               >
@@ -454,10 +469,10 @@ export default function DocumentEstimateModal({
                               <select
                                 value={effort.category || ''}
                                 onChange={(e) => updateFileEffort(index, effort.level, e.target.value)}
-                                className="px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white w-28"
+                                className="px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white w-52"
                               >
                                 <option value="">Optional...</option>
-                                {EFFORT_CATEGORIES[effort.level].map((cat) => (
+                                {ALL_DOCUMENT_TYPES.map((cat) => (
                                   <option key={cat} value={cat}>{cat}</option>
                                 ))}
                               </select>
