@@ -107,7 +107,7 @@ Output exactly in this JSON format with no additional text, explanations, markdo
     // Call Claude API with Haiku model
     console.log('Calling Claude API...');
     const message = await anthropic.messages.create({
-      model: 'claude-3-5-haiku-20241022',
+      model: 'claude-3-haiku-20240307',
       max_tokens: 1024,
       messages: [
         {

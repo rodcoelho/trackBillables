@@ -67,7 +67,7 @@ The AI is given a detailed prompt that:
 - Returns strict JSON format
 
 ### Model
-Uses **Claude 3.5 Haiku** (`claude-3-5-haiku-20241022`) - the fastest and most cost-effective model for this task.
+Uses **Claude 3 Haiku** (`claude-3-haiku-20240307`) - the fastest and most cost-effective model for this task.
 
 ## User Flow
 
