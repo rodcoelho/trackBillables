@@ -9,10 +9,11 @@ interface AddBillableFormProps {
   prefilledHours?: number;
   prefilledDescription?: string;
   onEmailEstimateClick?: () => void;
-  showEmailEstimate?: boolean;
+  onDocumentEstimateClick?: () => void;
+  showAiEstimate?: boolean;
 }
 
-export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDescription, onEmailEstimateClick, showEmailEstimate }: AddBillableFormProps) {
+export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDescription, onEmailEstimateClick, onDocumentEstimateClick, showAiEstimate }: AddBillableFormProps) {
   const [date, setDate] = useState(() => {
     const today = new Date();
     const year = today.getFullYear();
@@ -28,6 +29,7 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
   const [error, setError] = useState<string | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+  const [showAiDropdown, setShowAiDropdown] = useState(false);
   const supabase = createClient();
 
   // Update form when prefilled values change (from email estimate)
@@ -265,17 +267,65 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
           </div>
 
           <div className="flex gap-3">
-            {showEmailEstimate && (
-              <button
-                type="button"
-                onClick={onEmailEstimateClick}
-                className="px-4 py-3 bg-purple-600 text-white font-medium rounded-md shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors flex items-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                Email Estimate
-              </button>
+            {showAiEstimate && (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowAiDropdown(!showAiDropdown)}
+                  className="px-4 py-3 bg-purple-600 text-white font-medium rounded-md shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                  AI Estimate
+                  <svg className={`w-4 h-4 transition-transform ${showAiDropdown ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {showAiDropdown && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setShowAiDropdown(false)}
+                    />
+                    <div className="absolute left-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-md shadow-lg z-20 border border-gray-200 dark:border-gray-700">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowAiDropdown(false);
+                          onEmailEstimateClick?.();
+                        }}
+                        className="w-full text-left px-4 py-3 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors flex items-center gap-3 border-b border-gray-100 dark:border-gray-700"
+                      >
+                        <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <div>
+                          <div className="font-medium text-gray-900 dark:text-white">Email Estimate</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">Analyze email chains</div>
+                        </div>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowAiDropdown(false);
+                          onDocumentEstimateClick?.();
+                        }}
+                        className="w-full text-left px-4 py-3 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors flex items-center gap-3"
+                      >
+                        <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <div>
+                          <div className="font-medium text-gray-900 dark:text-white">Document Estimate</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">Upload up to 15 docs</div>
+                        </div>
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             )}
             <button
               type="submit"

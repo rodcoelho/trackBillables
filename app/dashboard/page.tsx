@@ -10,6 +10,7 @@ import AnalyzeDrawer from '@/components/AnalyzeDrawer';
 import UpgradeBanner from '@/components/UpgradeBanner';
 import UserMenu from '@/components/UserMenu';
 import EmailEstimateModal from '@/components/EmailEstimateModal';
+import DocumentEstimateModal from '@/components/DocumentEstimateModal';
 import type { Subscription } from '@/types/database.types';
 
 export default function DashboardPage() {
@@ -19,6 +20,7 @@ export default function DashboardPage() {
   const [isExportDrawerOpen, setIsExportDrawerOpen] = useState(false);
   const [isAnalyzeDrawerOpen, setIsAnalyzeDrawerOpen] = useState(false);
   const [isEmailEstimateOpen, setIsEmailEstimateOpen] = useState(false);
+  const [isDocumentEstimateOpen, setIsDocumentEstimateOpen] = useState(false);
   const [prefilledHours, setPrefilledHours] = useState<number | undefined>(undefined);
   const [prefilledDescription, setPrefilledDescription] = useState<string | undefined>(undefined);
   const router = useRouter();
@@ -138,7 +140,8 @@ export default function DashboardPage() {
             prefilledHours={prefilledHours}
             prefilledDescription={prefilledDescription}
             onEmailEstimateClick={() => setIsEmailEstimateOpen(true)}
-            showEmailEstimate={subscription?.tier === 'pro' && ['active', 'trialing'].includes(subscription.status)}
+            onDocumentEstimateClick={() => setIsDocumentEstimateOpen(true)}
+            showAiEstimate={subscription?.tier === 'pro' && ['active', 'trialing'].includes(subscription.status)}
           />
         </div>
 
@@ -161,6 +164,14 @@ export default function DashboardPage() {
       <EmailEstimateModal
         isOpen={isEmailEstimateOpen}
         onClose={() => setIsEmailEstimateOpen(false)}
+        onEstimateGenerated={handleEstimateGenerated}
+        subscription={subscription}
+      />
+
+      {/* Document Estimate Modal */}
+      <DocumentEstimateModal
+        isOpen={isDocumentEstimateOpen}
+        onClose={() => setIsDocumentEstimateOpen(false)}
         onEstimateGenerated={handleEstimateGenerated}
         subscription={subscription}
       />
