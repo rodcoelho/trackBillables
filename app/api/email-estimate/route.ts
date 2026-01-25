@@ -4,21 +4,41 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Anthropic from '@anthropic-ai/sdk';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+// Force Node.js runtime (required for Anthropic SDK)
+export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
+  console.log('Email estimate API called');
+
   try {
+    // Check for API key first
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.error('ANTHROPIC_API_KEY is not set');
+      return NextResponse.json(
+        { error: 'Email estimate feature is not configured. Please contact support.' },
+        { status: 500 }
+      );
+    }
+
+    // Initialize Anthropic client inside the function
+    const anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    });
+
     // Verify authentication
+    console.log('Checking authentication...');
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
+      console.error('Auth error:', authError);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    console.log('User authenticated:', user.id);
+
     // Get user's subscription
+    console.log('Fetching subscription...');
     const { data: subscription, error: subError } = await supabase
       .from('subscriptions')
       .select('*')
@@ -26,11 +46,15 @@ export async function POST(request: Request) {
       .single();
 
     if (subError || !subscription) {
+      console.error('Subscription error:', subError);
       return NextResponse.json({ error: 'Subscription not found' }, { status: 404 });
     }
 
+    console.log('Subscription tier:', subscription.tier, 'Status:', subscription.status);
+
     // Check if user is Pro
     if (subscription.tier !== 'pro' || !['active', 'trialing'].includes(subscription.status)) {
+      console.log('User is not Pro, rejecting request');
       return NextResponse.json(
         {
           error: 'This feature is only available for Pro users.',
@@ -41,14 +65,19 @@ export async function POST(request: Request) {
     }
 
     // Parse request body
+    console.log('Parsing request body...');
     const { attorney_email, email_chain } = await request.json();
 
     if (!attorney_email || !email_chain) {
+      console.error('Missing required fields');
       return NextResponse.json(
         { error: 'Attorney email and email chain are required' },
         { status: 400 }
       );
     }
+
+    console.log('Attorney email:', attorney_email);
+    console.log('Email chain length:', email_chain.length);
 
     // Construct the prompt for Claude
     const prompt = `You are an experienced attorney specializing in billing practices for legal work, particularly email correspondence involving document review and responses. Your task is to analyze the provided email chain and estimate the billable time for handling it, assuming a standard hourly billing model with 0.1-hour (6-minute) increments and a minimum of 0.1 hours per interaction.
@@ -76,6 +105,7 @@ Output exactly in this JSON format with no additional text, explanations, markdo
 }`;
 
     // Call Claude API with Haiku model
+    console.log('Calling Claude API...');
     const message = await anthropic.messages.create({
       model: 'claude-3-5-haiku-20241022',
       max_tokens: 1024,
@@ -87,15 +117,20 @@ Output exactly in this JSON format with no additional text, explanations, markdo
       ],
     });
 
+    console.log('Claude API response received');
+
     // Extract the response
     const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
+    console.log('Response text:', responseText);
 
     // Parse JSON response
     let parsedResponse;
     try {
       parsedResponse = JSON.parse(responseText);
+      console.log('Parsed response:', parsedResponse);
     } catch (parseError) {
       console.error('Failed to parse Claude response:', responseText);
+      console.error('Parse error:', parseError);
       return NextResponse.json(
         { error: 'Failed to parse AI response. Please try again or enter manually.' },
         { status: 500 }
@@ -107,6 +142,7 @@ Output exactly in this JSON format with no additional text, explanations, markdo
       typeof parsedResponse.billable_hours !== 'number' ||
       typeof parsedResponse.description !== 'string'
     ) {
+      console.error('Invalid response structure:', parsedResponse);
       return NextResponse.json(
         { error: 'Invalid response format from AI. Please try again or enter manually.' },
         { status: 500 }
@@ -115,12 +151,15 @@ Output exactly in this JSON format with no additional text, explanations, markdo
 
     // Save attorney_email to database if it's different
     if (attorney_email !== subscription.attorney_email) {
+      console.log('Saving attorney email to database...');
       const adminClient = createAdminClient();
       await adminClient
         .from('subscriptions')
         .update({ attorney_email })
         .eq('user_id', user.id);
     }
+
+    console.log('Returning estimate:', parsedResponse.billable_hours, 'hours');
 
     // Return the estimate
     return NextResponse.json({
@@ -129,6 +168,8 @@ Output exactly in this JSON format with no additional text, explanations, markdo
     });
   } catch (error) {
     console.error('Email estimate error:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error('Error message:', error instanceof Error ? error.message : String(error));
     return NextResponse.json(
       { error: 'Failed to generate estimate. Please try again or enter manually.' },
       { status: 500 }
