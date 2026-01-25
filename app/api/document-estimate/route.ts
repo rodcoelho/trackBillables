@@ -198,6 +198,13 @@ Output exactly in this JSON format with no additional text, explanations, markdo
         cleanedText = cleanedText.trim();
       }
 
+      // Extract JSON if there's explanatory text before it
+      const firstBrace = cleanedText.indexOf('{');
+      const lastBrace = cleanedText.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace !== -1 && firstBrace < lastBrace) {
+        cleanedText = cleanedText.substring(firstBrace, lastBrace + 1);
+      }
+
       // Parse JSON response
       let parsedResponse;
       try {
@@ -335,6 +342,13 @@ Output exactly in this JSON format with no additional text, explanations, markdo
         cleanedText = cleanedText.replace(/^```(?:json)?\n?/, '');
         cleanedText = cleanedText.replace(/\n?```$/, '');
         cleanedText = cleanedText.trim();
+      }
+
+      // Extract JSON if there's explanatory text before it
+      const firstBrace = cleanedText.indexOf('{');
+      const lastBrace = cleanedText.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace !== -1 && firstBrace < lastBrace) {
+        cleanedText = cleanedText.substring(firstBrace, lastBrace + 1);
       }
 
       // Parse JSON response

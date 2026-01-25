@@ -108,7 +108,9 @@ ${email_chain}
 
 IMPORTANT: Your description must reference the actual content and dates from the emails above. Do NOT use generic placeholder text. Describe what the attorney actually did (e.g., "Reviewed client's contract question email (0.1 hours); drafted response with initial legal analysis of indemnification clause (0.3 hours)").
 
-Output format (JSON only, no markdown):
+You must output ONLY valid JSON with no additional text, explanations, preamble, or markdown code blocks. Start your response directly with the opening brace {
+
+Required output format:
 {
   "billable_hours": [calculated total],
   "description": "[Specific description of actual work performed with times]"
@@ -141,6 +143,13 @@ Output format (JSON only, no markdown):
       // Remove ``` from end
       cleanedText = cleanedText.replace(/\n?```$/, '');
       cleanedText = cleanedText.trim();
+    }
+
+    // Extract JSON if there's explanatory text before it
+    const firstBrace = cleanedText.indexOf('{');
+    const lastBrace = cleanedText.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace !== -1 && firstBrace < lastBrace) {
+      cleanedText = cleanedText.substring(firstBrace, lastBrace + 1);
     }
 
     // Parse JSON response
