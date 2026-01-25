@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { PDFDocument } from 'pdf-lib';
 import type { Subscription } from '@/types/database.types';
 
 interface DocumentEstimateModalProps {
@@ -16,7 +17,11 @@ type EffortLevel = 'low' | 'medium' | 'high';
 
 interface FileEffort {
   level: EffortLevel;
-  category: string;
+  category?: string;
+}
+
+interface FileMetadata {
+  pageCount?: number;
 }
 
 const EFFORT_CATEGORIES = {
@@ -52,11 +57,12 @@ export default function DocumentEstimateModal({
   const [files, setFiles] = useState<File[]>([]);
   const [analysisMode, setAnalysisMode] = useState<AnalysisMode>('simple');
   const [fileEfforts, setFileEfforts] = useState<Map<number, FileEffort>>(new Map());
+  const [fileMetadata, setFileMetadata] = useState<Map<number, FileMetadata>>(new Map());
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showUpgrade, setShowUpgrade] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
 
     const selectedFiles = Array.from(e.target.files);
@@ -79,12 +85,33 @@ export default function DocumentEstimateModal({
     setFiles(selectedFiles);
     setError(null);
 
-    // Initialize file efforts for simple mode
+    // Initialize file efforts for simple mode (no default category)
     const newEfforts = new Map<number, FileEffort>();
     selectedFiles.forEach((_, index) => {
-      newEfforts.set(index, { level: 'low', category: EFFORT_CATEGORIES.low[0] });
+      newEfforts.set(index, { level: 'low', category: '' });
     });
     setFileEfforts(newEfforts);
+
+    // Extract metadata (page counts for PDFs)
+    const newMetadata = new Map<number, FileMetadata>();
+    await Promise.all(
+      selectedFiles.map(async (file, index) => {
+        if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+          try {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdfDoc = await PDFDocument.load(arrayBuffer);
+            const pageCount = pdfDoc.getPageCount();
+            newMetadata.set(index, { pageCount });
+          } catch (error) {
+            console.error('Failed to extract PDF page count:', error);
+            newMetadata.set(index, {});
+          }
+        } else {
+          newMetadata.set(index, {});
+        }
+      })
+    );
+    setFileMetadata(newMetadata);
   };
 
   const removeFile = (index: number) => {
@@ -98,10 +125,22 @@ export default function DocumentEstimateModal({
       if (oldEffort) {
         newEfforts.set(i, oldEffort);
       } else {
-        newEfforts.set(i, { level: 'low', category: EFFORT_CATEGORIES.low[0] });
+        newEfforts.set(i, { level: 'low', category: '' });
       }
     });
     setFileEfforts(newEfforts);
+
+    // Update metadata map
+    const newMetadata = new Map<number, FileMetadata>();
+    newFiles.forEach((_, i) => {
+      const oldMetadata = fileMetadata.get(i < index ? i : i + 1);
+      if (oldMetadata) {
+        newMetadata.set(i, oldMetadata);
+      } else {
+        newMetadata.set(i, {});
+      }
+    });
+    setFileMetadata(newMetadata);
   };
 
   const updateFileEffort = (index: number, level: EffortLevel, category: string) => {
@@ -116,7 +155,7 @@ export default function DocumentEstimateModal({
       return;
     }
 
-    // In simple mode, validate that all files have effort selected
+    // In simple mode, effort level is required (category is optional)
     if (analysisMode === 'simple') {
       const missingEffort = files.some((_, index) => !fileEfforts.has(index));
       if (missingEffort) {
@@ -131,14 +170,16 @@ export default function DocumentEstimateModal({
     try {
       if (analysisMode === 'simple') {
         // Simple mode: send metadata only
-        const fileMetadata = files.map((file, index) => {
+        const filesMetadata = files.map((file, index) => {
           const effort = fileEfforts.get(index)!;
+          const metadata = fileMetadata.get(index) || {};
           return {
             name: file.name,
             size: file.size,
             type: file.type,
             level: effort.level,
-            category: effort.category,
+            category: effort.category || undefined,
+            pageCount: metadata.pageCount,
           };
         });
 
@@ -147,7 +188,7 @@ export default function DocumentEstimateModal({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             mode: 'simple',
-            files: fileMetadata,
+            files: filesMetadata,
           }),
         });
 
@@ -188,6 +229,7 @@ export default function DocumentEstimateModal({
       // Reset and close
       setFiles([]);
       setFileEfforts(new Map());
+      setFileMetadata(new Map());
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate estimate');
@@ -346,6 +388,7 @@ export default function DocumentEstimateModal({
                   onClick={() => {
                     setFiles([]);
                     setFileEfforts(new Map());
+                    setFileMetadata(new Map());
                   }}
                   className="text-sm text-red-600 dark:text-red-400 hover:underline"
                 >
@@ -354,7 +397,8 @@ export default function DocumentEstimateModal({
               </div>
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {files.map((file, index) => {
-                  const effort = fileEfforts.get(index) || { level: 'low', category: EFFORT_CATEGORIES.low[0] };
+                  const effort = fileEfforts.get(index) || { level: 'low', category: '' };
+                  const metadata = fileMetadata.get(index) || {};
 
                   return (
                     <div
@@ -372,6 +416,9 @@ export default function DocumentEstimateModal({
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
                               {formatFileSize(file.size)}
+                              {metadata.pageCount && (
+                                <span className="ml-2">• {metadata.pageCount} page{metadata.pageCount !== 1 ? 's' : ''}</span>
+                              )}
                             </p>
                           </div>
                         </div>
@@ -390,13 +437,16 @@ export default function DocumentEstimateModal({
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                              Effort Level
+                              Effort Level <span className="text-red-500">*</span>
                             </label>
                             <select
                               value={effort.level}
                               onChange={(e) => {
                                 const newLevel = e.target.value as EffortLevel;
-                                updateFileEffort(index, newLevel, EFFORT_CATEGORIES[newLevel][0]);
+                                // Keep existing category if it's valid for the new level, otherwise clear it
+                                const validCategories = EFFORT_CATEGORIES[newLevel];
+                                const newCategory = validCategories.includes(effort.category || '') ? effort.category : '';
+                                updateFileEffort(index, newLevel, newCategory || '');
                               }}
                               className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                             >
@@ -407,13 +457,14 @@ export default function DocumentEstimateModal({
                           </div>
                           <div>
                             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                              Document Type
+                              Document Type (Optional)
                             </label>
                             <select
-                              value={effort.category}
+                              value={effort.category || ''}
                               onChange={(e) => updateFileEffort(index, effort.level, e.target.value)}
                               className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                             >
+                              <option value="">Select type...</option>
                               {EFFORT_CATEGORIES[effort.level].map((cat) => (
                                 <option key={cat} value={cat}>{cat}</option>
                               ))}

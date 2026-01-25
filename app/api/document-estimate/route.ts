@@ -111,15 +111,27 @@ export async function POST(request: Request) {
 
       // Build prompt for simple mode
       const fileDescriptions = files.map((file: any, index: number) => {
-        return `Document ${index + 1}: "${file.name}" (${formatFileSize(file.size)}, Effort Level: ${file.level.toUpperCase()}, Type: ${file.category})`;
+        const parts = [
+          `Document ${index + 1}: "${file.name}"`,
+          `${formatFileSize(file.size)}`,
+        ];
+        if (file.pageCount) {
+          parts.push(`${file.pageCount} pages`);
+        }
+        parts.push(`Effort Level: ${file.level.toUpperCase()}`);
+        if (file.category) {
+          parts.push(`Type: ${file.category}`);
+        }
+        return parts.join(', ');
       }).join('\n');
 
       const prompt = `You are an experienced attorney specializing in billing practices for legal work, particularly document review and analysis. Your task is to estimate billable time based on document metadata and categorization.
 
 You are provided with a list of documents, each with:
 - File name and size
+- Page count (for PDFs, when available)
 - Effort level (low, medium, high)
-- Document type category
+- Document type category (optional - may not always be provided)
 
 Estimate billable hours using these guidelines:
 
@@ -135,7 +147,7 @@ HIGH EFFORT (Legal Brief or Motion, Deposition or Transcript, Technical Report, 
 - Typically 0.7-1.5 hours per document
 - In-depth analysis, research, strategic thinking
 
-Consider file size as a secondary factor (larger files may require more time within the effort level range).
+Consider file size and page count as secondary factors (larger files and more pages may require more time within the effort level range). When page count is provided for PDFs, use it as the primary indicator of document length. When document type is provided, use it to refine your estimate within the effort level range.
 
 Round to the nearest 0.1 hour and sum for total billable time.
 
