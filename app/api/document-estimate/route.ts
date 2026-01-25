@@ -127,38 +127,48 @@ export async function POST(request: Request) {
 
       const prompt = `You are an experienced attorney specializing in billing practices for legal work, particularly document review and analysis. Your task is to estimate billable time based on document metadata and categorization.
 
-You are provided with a list of documents, each with:
-- File name and size
-- Page count (for PDFs, when available)
-- Effort level (low, medium, high)
-- Document type category (optional - may not always be provided)
+You are provided with a list of documents with file names, sizes, page counts (when available), effort levels, and optional document type categories.
 
-Estimate billable hours using these guidelines:
+Estimate billable hours using these baseline guidelines:
 
-LOW EFFORT (Brief Correspondence, Standard Form Document, Administrative Record):
-- Typically 0.1-0.2 hours per document
-- Quick review, minimal analysis required
+LOW EFFORT:
+- Base time: 0.1 hours (6 minutes)
+- Use for quick reviews, brief correspondence, simple forms
+- Adjust upward based on page count and file size (e.g., 10+ pages might warrant 0.2 hours)
 
-MEDIUM EFFORT (Email Chain with Attachments, Contract or Agreement, Financial Statement, Discovery Response):
-- Typically 0.3-0.6 hours per document
-- Moderate analysis, some cross-referencing
+MEDIUM EFFORT:
+- Base time range: 0.1-0.3 hours (6-18 minutes)
+- Use for contracts, email chains, financial statements, discovery responses
+- Scale within range based on page count and complexity (e.g., 5 pages = 0.1 hours, 30 pages = 0.3 hours, 50+ pages = up to 0.5 hours)
 
-HIGH EFFORT (Legal Brief or Motion, Deposition or Transcript, Technical Report, Complex Regulatory Filing, Research Memo or Opinion):
-- Typically 0.7-1.5 hours per document
-- In-depth analysis, research, strategic thinking
+HIGH EFFORT:
+- Base time: 0.3+ hours (18+ minutes)
+- Use for legal briefs, depositions, technical reports, regulatory filings, memos
+- Scale significantly with page count (e.g., 10 pages = 0.3 hours, 30 pages = 0.7 hours, 50+ pages = 1.0+ hours)
 
-Consider file size and page count as secondary factors (larger files and more pages may require more time within the effort level range). When page count is provided for PDFs, use it as the primary indicator of document length. When document type is provided, use it to refine your estimate within the effort level range.
+Use page count as the primary factor for adjusting time within effort levels. File size is secondary. Document type category (when provided) helps refine the estimate.
 
 Round to the nearest 0.1 hour and sum for total billable time.
 
 Documents:
 ${fileDescriptions}
 
+IMPORTANT: In your description output, include:
+- The file name (not "Document 1")
+- Page count in parentheses if available (e.g., "Contract.pdf (23 pages)")
+- Brief description of work performed (e.g., "reviewed", "analyzed with research", "quick review")
+- Time spent in parentheses (e.g., "(0.5 hours)")
+
+Do NOT include in the description:
+- File size
+- Effort level
+- Document type category
+
 Output exactly in this JSON format with no additional text, explanations, markdown, or preamble:
 
 {
   "billable_hours": 1.2,
-  "description": "Reviewed Document 1 (Brief Correspondence, 45 KB) with quick review (0.1 hours); analyzed Document 2 (Contract, 2.3 MB) with moderate complexity (0.5 hours); performed in-depth review of Document 3 (Legal Brief, 1.8 MB) including legal research (1.2 hours)."
+  "description": "Reviewed Contract.pdf (47 pages) (0.5 hours); analyzed Legal-Brief.pdf (33 pages) with in-depth research (1.0 hours); quick review of Admin-Record.pdf (4 pages) (0.1 hours); reviewed Other-Document.pdf (40 pages) with moderate analysis (0.4 hours)."
 }`;
 
       // Call Claude API with Haiku (cheap model for simple mode)
