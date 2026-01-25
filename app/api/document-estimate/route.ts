@@ -151,10 +151,10 @@ Output exactly in this JSON format with no additional text, explanations, markdo
   "description": "Reviewed Document 1 (short PDF, 5 pages) and analyzed implications (0.2 hours); reviewed Document 2 (detailed text file) with cross-references (0.3 hours); continued with Documents 3-5, synthesizing legal aspects (0.7 hours)."
 }`;
 
-    // Call Claude API with document support
+    // Call Claude API with document support (Sonnet required for PDF/document input)
     console.log('Calling Claude API with', files.length, 'documents...');
     const message = await anthropic.messages.create({
-      model: 'claude-3-haiku-20240307',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 1024,
       messages: [
         {
