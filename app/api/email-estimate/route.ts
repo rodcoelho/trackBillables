@@ -80,19 +80,18 @@ export async function POST(request: Request) {
     console.log('Email chain length:', email_chain.length);
 
     // Construct the prompt for Claude
-    const prompt = `You are an experienced attorney specializing in billing practices for legal work. Your task is to analyze an email chain and estimate billable time based on the attorney's actual work.
+    const prompt = `You are an experienced attorney analyzing an email chain to estimate billable time based on actual work performed.
 
 CRITICAL INSTRUCTIONS:
-1. First, verify this is legal correspondence. If the emails are personal, customer service, shopping, or non-legal matters, return 0.0 hours with an appropriate description.
-2. Count ONLY emails FROM the attorney's email address: ${attorney_email}
-3. For EACH attorney email, analyze the actual content, length, and complexity
-4. Do NOT use generic estimates - examine what was actually written
+1. Count ONLY emails FROM the attorney's email address: ${attorney_email}
+2. For EACH attorney email, analyze the actual content, length, and complexity
+3. Do NOT use generic estimates - examine what was actually written
 
 ANALYSIS STEPS:
 1. Identify all emails FROM ${attorney_email}
 2. For each attorney email, estimate time based on:
    - Length: Quick reply (1-2 sentences) = 0.1 hours, Medium (1-2 paragraphs) = 0.2 hours, Long/detailed = 0.3+ hours
-   - Complexity: Simple acknowledgment = 0.1 hours, Legal analysis/advice = 0.3-0.5 hours, Complex research/strategy = 0.5+ hours
+   - Complexity: Simple acknowledgment/follow-up = 0.1 hours, Substantive response = 0.2-0.3 hours, Complex analysis = 0.3-0.5 hours
    - Reading incoming messages before responding: Brief = add 0.1 hours, Detailed with attachments = add 0.2-0.3 hours
 
 3. Sum the total time for all attorney emails
@@ -100,13 +99,13 @@ ANALYSIS STEPS:
 BILLING RULES:
 - Use 0.1-hour (6-minute) increments
 - Minimum 0.1 hours per email response
-- Do not bill for emails TO the attorney (client emails)
-- Do not include administrative tasks
+- Do not bill for emails TO the attorney (those are incoming)
+- Count actual reading and writing time
 
 Email chain to analyze:
 ${email_chain}
 
-IMPORTANT: Your description must reference the actual content and dates from the emails above. Do NOT use generic placeholder text. Describe what the attorney actually did (e.g., "Reviewed client's contract question email (0.1 hours); drafted response with initial legal analysis of indemnification clause (0.3 hours)").
+IMPORTANT: Your description must reference the actual content and dates from the emails above. Do NOT use generic placeholder text. Describe what was actually done based on the email content (e.g., "Reviewed client email re: order status (0.1 hours); sent follow-up inquiry Nov 10 (0.1 hours); sent second follow-up Dec 8 (0.1 hours); sent final follow-up Dec 15 (0.1 hours)").
 
 You must output ONLY valid JSON with no additional text, explanations, preamble, or markdown code blocks. Start your response directly with the opening brace {
 
