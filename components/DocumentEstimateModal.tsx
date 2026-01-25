@@ -529,23 +529,6 @@ export default function DocumentEstimateModal({
             </div>
           )}
 
-          {/* How It Works - In-Depth Mode Only */}
-          {analysisMode === 'in-depth' && (
-            <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
-              <h3 className="font-semibold text-purple-900 dark:text-purple-300 mb-2 flex items-center gap-2">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                How It Works
-              </h3>
-              <ul className="text-sm text-purple-800 dark:text-purple-300 space-y-1">
-                <li>• AI analyzes document length, complexity, and content</li>
-                <li>• Estimates time for reading, reviewing, and legal analysis</li>
-                <li>• Rounds to 0.1-hour (6-minute) increments</li>
-                <li>• Returns total billable hours with detailed breakdown</li>
-              </ul>
-            </div>
-          )}
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">

@@ -256,12 +256,9 @@ Output exactly in this JSON format with no additional text, explanations, markdo
       console.log('Processing', files.length, 'documents');
 
       // Build document summaries for the prompt
-      const documentSummaries = await Promise.all(
-        files.map(async (file, index) => {
-          const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
-          return `Document ${index + 1}: "${file.name}" (${sizeInMB} MB, type: ${file.type || 'unknown'})`;
-        })
-      );
+      const documentSummaries = files.map((file) => {
+        return `"${file.name}"`;
+      });
 
       // Convert files to base64 for Claude API
       const documentContents = await Promise.all(
@@ -292,13 +289,19 @@ Do not assume drafting responses unless explicitly indicated in the documents; f
 
 Do not include non-billable time like administrative tasks. Round up to the nearest 0.1 hour per task and sum for the total.
 
-Input: ${documentSummaries.join('; ')}
+Documents: ${documentSummaries.join('; ')}
+
+IMPORTANT: In your description output:
+- Refer to each document by its actual file name (e.g., "Contract.pdf", not "Document 1")
+- Include page count in parentheses if relevant (e.g., "Contract.pdf (23 pages)")
+- Include brief description of work performed and time spent (e.g., "(0.5 hours)")
+- Do NOT include file size
 
 Output exactly in this JSON format with no additional text, explanations, markdown, or preamble:
 
 {
   "billable_hours": 1.2,
-  "description": "Reviewed Document 1 (short PDF, 5 pages) and analyzed implications (0.2 hours); reviewed Document 2 (detailed text file) with cross-references (0.3 hours); continued with Documents 3-5, synthesizing legal aspects (0.7 hours)."
+  "description": "Reviewed Contract.pdf (23 pages) and analyzed implications (0.5 hours); reviewed MemoToClient.pdf (5 pages) with cross-references (0.2 hours); analyzed Brief.pdf (33 pages) with in-depth legal research (0.5 hours)."
 }`;
 
       // Call Claude API with document support
