@@ -214,6 +214,12 @@ Output exactly in this JSON format with no additional text, explanations, markdo
         cleanedText = cleanedText.substring(firstBrace, lastBrace + 1);
       }
 
+      // Fix unescaped newlines in the description field
+      cleanedText = cleanedText.replace(
+        /"description":\s*"([\s\S]*?)"/,
+        (match, content) => `"description": "${content.replace(/\n/g, '\\n')}"`
+      );
+
       // Parse JSON response
       let parsedResponse;
       try {
@@ -370,6 +376,12 @@ Output exactly in this JSON format with no additional text, explanations, markdo
       if (firstBrace !== -1 && lastBrace !== -1 && firstBrace < lastBrace) {
         cleanedText = cleanedText.substring(firstBrace, lastBrace + 1);
       }
+
+      // Fix unescaped newlines in the description field
+      cleanedText = cleanedText.replace(
+        /"description":\s*"([\s\S]*?)"/,
+        (match, content) => `"description": "${content.replace(/\n/g, '\\n')}"`
+      );
 
       // Parse JSON response
       let parsedResponse;
