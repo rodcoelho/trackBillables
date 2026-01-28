@@ -153,20 +153,16 @@ Round to the nearest 0.1 hour and sum for total billable time.
 Documents:
 ${fileDescriptions}
 
-IMPORTANT: Format your description with each document on TWO lines:
-Line 1: The file name only (not "Document 1")
-Line 2: Page count (if available) • hours spent
+IMPORTANT: Format your description with each document on ONE line:
+Filename - page count • hours spent
 
 Use a bullet point (•) to separate page count and hours.
-Include brief context about work performed in natural language if helpful.
+Put each document on a separate line.
 
 Example format:
-8-November-Combined-PDF-for-Upload.pdf
-47 pages • 0.5 hours
-2025-National-Security-Strategy.pdf
-33 pages • 0.3 hours
-School-Rules.pdf
-4 pages • 0.2 hours
+8-November-Combined-PDF-for-Upload.pdf - 47 pages • 0.5 hours
+2025-National-Security-Strategy.pdf - 33 pages • 0.3 hours
+School-Rules.pdf - 4 pages • 0.2 hours
 
 Do NOT include in the description:
 - File size
@@ -177,7 +173,7 @@ Output exactly in this JSON format with no additional text, explanations, markdo
 
 {
   "billable_hours": 1.2,
-  "description": "Contract.pdf\n47 pages • 0.5 hours\nLegal-Brief.pdf\n33 pages • 1.0 hours\nAdmin-Record.pdf\n4 pages • 0.1 hours\nOther-Document.pdf\n40 pages • 0.4 hours"
+  "description": "Contract.pdf - 47 pages • 0.5 hours\nLegal-Brief.pdf - 33 pages • 1.0 hours\nAdmin-Record.pdf - 4 pages • 0.1 hours\nOther-Document.pdf - 40 pages • 0.4 hours"
 }`;
 
       // Call Claude API with Haiku (cheap model for simple mode)
@@ -313,20 +309,16 @@ Do not include non-billable time like administrative tasks. Round up to the near
 
 Documents: ${documentSummaries.join('; ')}
 
-IMPORTANT: Format your description with each document on TWO lines:
-Line 1: The file name only (use actual file names like "Contract.pdf", not "Document 1")
-Line 2: Page count (if relevant) • hours spent
+IMPORTANT: Format your description with each document on ONE line:
+Filename - page count • hours spent
 
 Use a bullet point (•) to separate page count and hours.
-Include brief context about work performed in natural language if helpful.
+Put each document on a separate line.
 
 Example format:
-Contract.pdf
-23 pages • 0.5 hours
-MemoToClient.pdf
-5 pages • 0.2 hours
-Brief.pdf
-33 pages • 0.5 hours
+Contract.pdf - 23 pages • 0.5 hours
+MemoToClient.pdf - 5 pages • 0.2 hours
+Brief.pdf - 33 pages • 0.5 hours
 
 Do NOT include file size in the description.
 
@@ -334,7 +326,7 @@ Output exactly in this JSON format with no additional text, explanations, markdo
 
 {
   "billable_hours": 1.2,
-  "description": "Contract.pdf\n23 pages • 0.5 hours\nMemoToClient.pdf\n5 pages • 0.2 hours\nBrief.pdf\n33 pages • 0.5 hours"
+  "description": "Contract.pdf - 23 pages • 0.5 hours\nMemoToClient.pdf - 5 pages • 0.2 hours\nBrief.pdf - 33 pages • 0.5 hours"
 }`;
 
       // Call Claude API with document support
