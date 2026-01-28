@@ -153,27 +153,33 @@ Round to the nearest 0.1 hour and sum for total billable time.
 Documents:
 ${fileDescriptions}
 
-IMPORTANT: Format your description with each document on ONE line:
-Filename - page count • hours spent
+IMPORTANT: Return an array of files with individual estimates. For each file, provide:
+- filename: The actual file name (not "Document 1")
+- pages: Number of pages (if available, otherwise null)
+- hours: Estimated billable hours for this specific file
 
-Use a bullet point (•) to separate page count and hours.
-Put each document on a separate line.
-
-Example format:
-8-November-Combined-PDF-for-Upload.pdf - 47 pages • 0.5 hours
-2025-National-Security-Strategy.pdf - 33 pages • 0.3 hours
-School-Rules.pdf - 4 pages • 0.2 hours
-
-Do NOT include in the description:
-- File size
-- Effort level
-- Document type category
+Do NOT include file size, effort level, or document type category.
 
 Output exactly in this JSON format with no additional text, explanations, markdown, or preamble:
 
 {
-  "billable_hours": 1.2,
-  "description": "Contract.pdf - 47 pages • 0.5 hours\nLegal-Brief.pdf - 33 pages • 1.0 hours\nAdmin-Record.pdf - 4 pages • 0.1 hours\nOther-Document.pdf - 40 pages • 0.4 hours"
+  "files": [
+    {
+      "filename": "Contract.pdf",
+      "pages": 47,
+      "hours": 0.5
+    },
+    {
+      "filename": "Legal-Brief.pdf",
+      "pages": 33,
+      "hours": 1.0
+    },
+    {
+      "filename": "Admin-Record.pdf",
+      "pages": 4,
+      "hours": 0.1
+    }
+  ]
 }`;
 
       // Call Claude API with Haiku (cheap model for simple mode)
@@ -210,12 +216,6 @@ Output exactly in this JSON format with no additional text, explanations, markdo
         cleanedText = cleanedText.substring(firstBrace, lastBrace + 1);
       }
 
-      // Fix unescaped newlines in the description field
-      cleanedText = cleanedText.replace(
-        /"description":\s*"([\s\S]*?)"/,
-        (match, content) => `"description": "${content.replace(/\n/g, '\\n')}"`
-      );
-
       // Parse JSON response
       let parsedResponse;
       try {
@@ -231,10 +231,7 @@ Output exactly in this JSON format with no additional text, explanations, markdo
       }
 
       // Validate response structure
-      if (
-        typeof parsedResponse.billable_hours !== 'number' ||
-        typeof parsedResponse.description !== 'string'
-      ) {
+      if (!Array.isArray(parsedResponse.files) || parsedResponse.files.length === 0) {
         console.error('Invalid response structure:', parsedResponse);
         return NextResponse.json(
           { error: 'Invalid response format from AI. Please try again or enter manually.' },
@@ -242,12 +239,37 @@ Output exactly in this JSON format with no additional text, explanations, markdo
         );
       }
 
-      console.log('Returning simple mode estimate:', parsedResponse.billable_hours, 'hours');
+      // Calculate total hours and build description
+      let totalHours = 0;
+      const descriptionLines: string[] = [];
+
+      for (const file of parsedResponse.files) {
+        if (typeof file.hours !== 'number' || typeof file.filename !== 'string') {
+          console.error('Invalid file structure:', file);
+          return NextResponse.json(
+            { error: 'Invalid file format from AI. Please try again or enter manually.' },
+            { status: 500 }
+          );
+        }
+
+        totalHours += file.hours;
+
+        // Format: "filename - pages - hours" or "filename - hours" if no pages
+        if (file.pages) {
+          descriptionLines.push(`${file.filename} - ${file.pages} pages - ${file.hours} hours`);
+        } else {
+          descriptionLines.push(`${file.filename} - ${file.hours} hours`);
+        }
+      }
+
+      const description = descriptionLines.join('\n');
+
+      console.log('Returning simple mode estimate:', totalHours, 'hours');
 
       // Return the estimate
       return NextResponse.json({
-        billable_hours: parsedResponse.billable_hours,
-        description: parsedResponse.description,
+        billable_hours: totalHours,
+        description: description,
       });
     } else {
       // IN-DEPTH MODE: Full document analysis
@@ -309,24 +331,33 @@ Do not include non-billable time like administrative tasks. Round up to the near
 
 Documents: ${documentSummaries.join('; ')}
 
-IMPORTANT: Format your description with each document on ONE line:
-Filename - page count • hours spent
+IMPORTANT: Return an array of files with individual estimates. For each file, provide:
+- filename: The actual file name (use the real filename from the document list)
+- pages: Number of pages (if relevant, otherwise null)
+- hours: Estimated billable hours for this specific file
 
-Use a bullet point (•) to separate page count and hours.
-Put each document on a separate line.
-
-Example format:
-Contract.pdf - 23 pages • 0.5 hours
-MemoToClient.pdf - 5 pages • 0.2 hours
-Brief.pdf - 33 pages • 0.5 hours
-
-Do NOT include file size in the description.
+Do NOT include file size in the output.
 
 Output exactly in this JSON format with no additional text, explanations, markdown, or preamble:
 
 {
-  "billable_hours": 1.2,
-  "description": "Contract.pdf - 23 pages • 0.5 hours\nMemoToClient.pdf - 5 pages • 0.2 hours\nBrief.pdf - 33 pages • 0.5 hours"
+  "files": [
+    {
+      "filename": "Contract.pdf",
+      "pages": 23,
+      "hours": 0.5
+    },
+    {
+      "filename": "MemoToClient.pdf",
+      "pages": 5,
+      "hours": 0.2
+    },
+    {
+      "filename": "Brief.pdf",
+      "pages": 33,
+      "hours": 0.5
+    }
+  ]
 }`;
 
       // Call Claude API with document support
@@ -369,12 +400,6 @@ Output exactly in this JSON format with no additional text, explanations, markdo
         cleanedText = cleanedText.substring(firstBrace, lastBrace + 1);
       }
 
-      // Fix unescaped newlines in the description field
-      cleanedText = cleanedText.replace(
-        /"description":\s*"([\s\S]*?)"/,
-        (match, content) => `"description": "${content.replace(/\n/g, '\\n')}"`
-      );
-
       // Parse JSON response
       let parsedResponse;
       try {
@@ -390,10 +415,7 @@ Output exactly in this JSON format with no additional text, explanations, markdo
       }
 
       // Validate response structure
-      if (
-        typeof parsedResponse.billable_hours !== 'number' ||
-        typeof parsedResponse.description !== 'string'
-      ) {
+      if (!Array.isArray(parsedResponse.files) || parsedResponse.files.length === 0) {
         console.error('Invalid response structure:', parsedResponse);
         return NextResponse.json(
           { error: 'Invalid response format from AI. Please try again or enter manually.' },
@@ -401,12 +423,37 @@ Output exactly in this JSON format with no additional text, explanations, markdo
         );
       }
 
-      console.log('Returning estimate:', parsedResponse.billable_hours, 'hours');
+      // Calculate total hours and build description
+      let totalHours = 0;
+      const descriptionLines: string[] = [];
+
+      for (const file of parsedResponse.files) {
+        if (typeof file.hours !== 'number' || typeof file.filename !== 'string') {
+          console.error('Invalid file structure:', file);
+          return NextResponse.json(
+            { error: 'Invalid file format from AI. Please try again or enter manually.' },
+            { status: 500 }
+          );
+        }
+
+        totalHours += file.hours;
+
+        // Format: "filename - pages - hours" or "filename - hours" if no pages
+        if (file.pages) {
+          descriptionLines.push(`${file.filename} - ${file.pages} pages - ${file.hours} hours`);
+        } else {
+          descriptionLines.push(`${file.filename} - ${file.hours} hours`);
+        }
+      }
+
+      const description = descriptionLines.join('\n');
+
+      console.log('Returning estimate:', totalHours, 'hours');
 
       // Return the estimate
       return NextResponse.json({
-        billable_hours: parsedResponse.billable_hours,
-        description: parsedResponse.description,
+        billable_hours: totalHours,
+        description: description,
       });
     }
   } catch (error) {
