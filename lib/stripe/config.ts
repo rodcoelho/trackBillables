@@ -24,13 +24,13 @@ export const STRIPE_CONFIG = {
 // Pricing information (should match your Stripe prices)
 export const PRICING = {
   monthly: {
-    amount: 10,
+    amount: 15,
     currency: 'USD',
     interval: 'month',
     priceId: STRIPE_CONFIG.priceIds.monthly,
   },
   annual: {
-    amount: 100,
+    amount: 144,
     currency: 'USD',
     interval: 'year',
     priceId: STRIPE_CONFIG.priceIds.annual,

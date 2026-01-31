@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { stripe, STRIPE_CONFIG } from '@/lib/stripe/config';
 import { syncSubscriptionToSupabase, handleSubscriptionCanceled } from '@/lib/stripe/helpers';
+import { sendTrialEndingEmail, sendPaymentFailedEmail } from '@/lib/email';
 
 export async function POST(request: Request) {
   const body = await request.text();
@@ -54,9 +55,32 @@ export async function POST(request: Request) {
         break;
       }
 
+      case 'customer.subscription.trial_will_end': {
+        const subscription = event.data.object;
+        const customer = await stripe.customers.retrieve(subscription.customer as string);
+        if (!customer.deleted && customer.email && subscription.trial_end) {
+          const daysLeft = Math.max(
+            1,
+            Math.ceil((subscription.trial_end * 1000 - Date.now()) / (1000 * 60 * 60 * 24))
+          );
+          sendTrialEndingEmail(customer.email, daysLeft);
+        }
+        break;
+      }
+
       case 'invoice.payment_failed': {
         const invoice = event.data.object;
         console.error('Payment failed for invoice:', invoice.id);
+        let email = invoice.customer_email;
+        if (!email) {
+          const customer = await stripe.customers.retrieve(invoice.customer as string);
+          if (!customer.deleted) {
+            email = customer.email;
+          }
+        }
+        if (email) {
+          sendPaymentFailedEmail(email);
+        }
         break;
       }
 
