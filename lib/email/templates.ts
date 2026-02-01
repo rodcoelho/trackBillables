@@ -1,5 +1,13 @@
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 function emailWrapper(content: string): string {
   return `
 <!DOCTYPE html>
@@ -47,7 +55,7 @@ function ctaButton(text: string, href: string): string {
 }
 
 export function welcomeEmail(userName?: string): { subject: string; html: string } {
-  const greeting = userName ? `Hi ${userName},` : 'Hi there,';
+  const greeting = userName ? `Hi ${escapeHtml(userName)},` : 'Hi there,';
   return {
     subject: 'Welcome to TrackBillables!',
     html: emailWrapper(`
