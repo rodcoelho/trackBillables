@@ -111,7 +111,7 @@ export default function HomePage() {
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
             Start free. Upgrade when you need more.
           </p>
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
               <h4 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Free</h4>
               <div className="text-4xl font-bold text-gray-900 dark:text-white mb-4">$0</div>
@@ -122,32 +122,52 @@ export default function HomePage() {
               </ul>
               <Link
                 href="/login"
-                className="block w-full py-3 px-4 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                className="block w-full py-3 px-4 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-center"
               >
                 Get Started
+              </Link>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+              <h4 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Pro Monthly</h4>
+              <div className="text-4xl font-bold text-gray-900 dark:text-white mb-1">$15</div>
+              <div className="text-gray-600 dark:text-gray-400 mb-4">/month</div>
+              <ul className="space-y-3 text-gray-600 dark:text-gray-400 mb-6">
+                <li>✓ Unlimited billable entries</li>
+                <li>✓ Unlimited exports</li>
+                <li>✓ Advanced analytics</li>
+                <li>✓ AI-powered billable hour estimates</li>
+                <li>✓ Priority support</li>
+              </ul>
+              <Link
+                href="/pricing"
+                className="block w-full py-3 px-4 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-colors text-center"
+              >
+                Get Pro
               </Link>
             </div>
 
             <div className="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl p-8 shadow-lg relative">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                 <span className="bg-yellow-400 text-gray-900 px-4 py-1 rounded-full text-sm font-bold">
-                  POPULAR
+                  BEST VALUE
                 </span>
               </div>
-              <h4 className="text-2xl font-bold text-white mb-2">Pro</h4>
-              <div className="text-4xl font-bold text-white mb-1">$10</div>
-              <div className="text-indigo-200 mb-4">/month</div>
+              <h4 className="text-2xl font-bold text-white mb-2">Pro Annual</h4>
+              <div className="text-4xl font-bold text-white mb-1">$144</div>
+              <div className="text-indigo-200 mb-4">/year &mdash; $12/mo, save 20%</div>
               <ul className="space-y-3 text-white mb-6">
                 <li>✓ Unlimited billable entries</li>
                 <li>✓ Unlimited exports</li>
                 <li>✓ Advanced analytics</li>
+                <li>✓ AI-powered billable hour estimates</li>
                 <li>✓ Priority support</li>
               </ul>
               <Link
-                href="/login"
-                className="block w-full py-3 px-4 bg-white text-indigo-600 rounded-lg font-bold hover:bg-gray-50 transition-colors"
+                href="/pricing"
+                className="block w-full py-3 px-4 bg-white text-indigo-600 rounded-lg font-bold hover:bg-gray-50 transition-colors text-center"
               >
-                Start Free Trial
+                Get Pro
               </Link>
             </div>
           </div>
