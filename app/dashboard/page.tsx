@@ -165,7 +165,8 @@ export default function DashboardPage() {
             prefilledMatter={prefilledMatter}
             onEmailEstimateClick={() => setIsEmailEstimateOpen(true)}
             onDocumentEstimateClick={() => setIsDocumentEstimateOpen(true)}
-            showAiEstimate={subscription?.tier === 'pro' && ['active', 'trialing'].includes(subscription.status)}
+            showAiEstimate={true}
+            isPro={subscription?.tier === 'pro' && ['active', 'trialing'].includes(subscription.status)}
             onTemplateApply={handleTemplateApply}
           />
         </div>

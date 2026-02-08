@@ -15,10 +15,11 @@ interface AddBillableFormProps {
   onEmailEstimateClick?: () => void;
   onDocumentEstimateClick?: () => void;
   showAiEstimate?: boolean;
+  isPro?: boolean;
   onTemplateApply?: (template: TemplateWithTags) => void;
 }
 
-export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDescription, prefilledClient, prefilledMatter, onEmailEstimateClick, onDocumentEstimateClick, showAiEstimate, onTemplateApply }: AddBillableFormProps) {
+export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDescription, prefilledClient, prefilledMatter, onEmailEstimateClick, onDocumentEstimateClick, showAiEstimate, isPro, onTemplateApply }: AddBillableFormProps) {
   const [date, setDate] = useState(() => {
     const today = new Date();
     const year = today.getFullYear();
@@ -34,6 +35,7 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
   const [error, setError] = useState<string | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+  const [upgradeMessage, setUpgradeMessage] = useState("You've reached your free plan limit of 50 entries per month.");
   const [showAiDropdown, setShowAiDropdown] = useState(false);
   const supabase = createClient();
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
@@ -109,6 +111,7 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
 
     // Check if user can add entry
     if (!canAddEntry()) {
+      setUpgradeMessage("You've reached your free plan limit of 50 entries per month.");
       setShowUpgradePrompt(true);
       return;
     }
@@ -134,6 +137,7 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
       if (!response.ok) {
         // Check if it's an upgrade error
         if (data.upgrade) {
+          setUpgradeMessage("You've reached your free plan limit of 50 entries per month.");
           setShowUpgradePrompt(true);
           throw new Error(data.message);
         }
@@ -181,7 +185,7 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
         {isNearLimit && (
           <button
             type="button"
-            onClick={() => setShowUpgradePrompt(true)}
+            onClick={() => { setUpgradeMessage("You've reached your free plan limit of 50 entries per month."); setShowUpgradePrompt(true); }}
             className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
           >
             Upgrade to Pro for unlimited
@@ -325,33 +329,49 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
                         type="button"
                         onClick={() => {
                           setShowAiDropdown(false);
-                          onEmailEstimateClick?.();
+                          if (isPro) {
+                            onEmailEstimateClick?.();
+                          } else {
+                            setUpgradeMessage('AI Email Estimates are a Pro feature. Upgrade to analyze email chains and auto-fill billable entries.');
+                            setShowUpgradePrompt(true);
+                          }
                         }}
-                        className="w-full text-left px-4 py-3 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors flex items-center gap-3 border-b border-gray-100 dark:border-gray-700"
+                        className={`w-full text-left px-4 py-3 transition-colors flex items-center gap-3 border-b border-gray-100 dark:border-gray-700 ${isPro ? 'hover:bg-purple-50 dark:hover:bg-purple-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}`}
                       >
-                        <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className={`w-5 h-5 ${isPro ? 'text-purple-600 dark:text-purple-400' : 'text-gray-400 dark:text-gray-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
-                        <div>
-                          <div className="font-medium text-gray-900 dark:text-white">Email</div>
+                        <div className="flex-1">
+                          <div className={`font-medium ${isPro ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>Email</div>
                           <div className="text-xs text-gray-500 dark:text-gray-400">Analyze email chains</div>
                         </div>
+                        {!isPro && (
+                          <span className="text-xs font-semibold text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/30 px-2 py-0.5 rounded-full">PRO</span>
+                        )}
                       </button>
                       <button
                         type="button"
                         onClick={() => {
                           setShowAiDropdown(false);
-                          onDocumentEstimateClick?.();
+                          if (isPro) {
+                            onDocumentEstimateClick?.();
+                          } else {
+                            setUpgradeMessage('AI Document Estimates are a Pro feature. Upgrade to upload documents and auto-fill billable entries.');
+                            setShowUpgradePrompt(true);
+                          }
                         }}
-                        className="w-full text-left px-4 py-3 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors flex items-center gap-3"
+                        className={`w-full text-left px-4 py-3 transition-colors flex items-center gap-3 ${isPro ? 'hover:bg-purple-50 dark:hover:bg-purple-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}`}
                       >
-                        <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className={`w-5 h-5 ${isPro ? 'text-purple-600 dark:text-purple-400' : 'text-gray-400 dark:text-gray-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <div>
-                          <div className="font-medium text-gray-900 dark:text-white">Document</div>
+                        <div className="flex-1">
+                          <div className={`font-medium ${isPro ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>Document</div>
                           <div className="text-xs text-gray-500 dark:text-gray-400">Upload up to 15 docs</div>
                         </div>
+                        {!isPro && (
+                          <span className="text-xs font-semibold text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/30 px-2 py-0.5 rounded-full">PRO</span>
+                        )}
                       </button>
                     </div>
                   </>
@@ -378,7 +398,7 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
       {showUpgradePrompt && (
         <UpgradeModal
           onClose={() => setShowUpgradePrompt(false)}
-          message="You've reached your free plan limit of 50 entries per month."
+          message={upgradeMessage}
         />
       )}
     </>
