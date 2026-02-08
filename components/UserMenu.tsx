@@ -7,9 +7,17 @@ import Link from 'next/link';
 
 export default function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
+  const [email, setEmail] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
   const router = useRouter();
+
+  // Fetch user email
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) setEmail(user.email ?? null);
+    });
+  }, []);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -71,8 +79,17 @@ export default function UserMenu() {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
+        <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
           <div className="py-1" role="menu" aria-orientation="vertical">
+            {/* User Email */}
+            {email && (
+              <>
+                <div className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 truncate">
+                  {email}
+                </div>
+                <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
+              </>
+            )}
             {/* Billing Link */}
             <Link
               href="/billing"
