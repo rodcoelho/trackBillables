@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { PRICING } from '@/lib/pricing';
 import type { Billable, Subscription } from '@/types/database.types';
 
 interface DuplicateEntryModalProps {
@@ -166,10 +167,10 @@ export default function DuplicateEntryModal({ billable, onClose, onSuccess }: Du
                   <div className="flex justify-between items-center mb-2">
                     <div className="text-left">
                       <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                        $10<span className="text-sm font-normal">/month</span>
+                        {PRICING.monthly.label}<span className="text-sm font-normal">/month</span>
                       </div>
                       <div className="text-xs text-indigo-600 dark:text-indigo-400">
-                        Billed monthly
+                        {PRICING.monthly.description}
                       </div>
                     </div>
                     <button
@@ -190,10 +191,10 @@ export default function DuplicateEntryModal({ billable, onClose, onSuccess }: Du
                   <div className="flex justify-between items-center mb-2">
                     <div className="text-left">
                       <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                        $100<span className="text-sm font-normal">/year</span>
+                        {PRICING.annual.label}<span className="text-sm font-normal">/year</span>
                       </div>
                       <div className="text-xs text-green-600 dark:text-green-400">
-                        $8.33/month • Save $20
+                        {PRICING.annual.perMonth}/month &bull; Save {PRICING.annual.savings}
                       </div>
                     </div>
                     <button

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import HomePageWrapper from '@/components/HomePageWrapper';
+import { PRICING } from '@/lib/pricing';
 
 export default function HomePage() {
   return (
@@ -131,7 +132,7 @@ export default function HomePage() {
 
             <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
               <h4 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Pro Monthly</h4>
-              <div className="text-4xl font-bold text-gray-900 dark:text-white mb-1">$15</div>
+              <div className="text-4xl font-bold text-gray-900 dark:text-white mb-1">{PRICING.monthly.label}</div>
               <div className="text-gray-600 dark:text-gray-400 mb-4">/month</div>
               <ul className="space-y-3 text-gray-600 dark:text-gray-400 mb-6">
                 <li>✓ Unlimited billable entries</li>
@@ -156,8 +157,8 @@ export default function HomePage() {
                 </span>
               </div>
               <h4 className="text-2xl font-bold text-white mb-2">Pro Annual</h4>
-              <div className="text-4xl font-bold text-white mb-1">$144</div>
-              <div className="text-indigo-200 mb-4">/year &mdash; $12/mo, save 20%</div>
+              <div className="text-4xl font-bold text-white mb-1">{PRICING.annual.label}</div>
+              <div className="text-indigo-200 mb-4">/year &mdash; {PRICING.annual.perMonth}/mo, save {PRICING.annual.savings}</div>
               <ul className="space-y-3 text-white mb-6">
                 <li>✓ Unlimited billable entries</li>
                 <li>✓ Unlimited exports</li>

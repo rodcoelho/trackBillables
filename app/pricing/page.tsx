@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { PRICING } from '@/lib/pricing';
 import type { Subscription } from '@/types/database.types';
 
 function CheckIcon({ className }: { className: string }) {
@@ -147,7 +148,7 @@ function PricingPageContent() {
             <div className="mb-8">
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Pro Monthly</h3>
               <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-bold text-gray-900 dark:text-white">$15</span>
+                <span className="text-4xl font-bold text-gray-900 dark:text-white">{PRICING.monthly.label}</span>
                 <span className="text-gray-600 dark:text-gray-400">/month</span>
               </div>
             </div>
@@ -181,10 +182,10 @@ function PricingPageContent() {
             <div className="mb-8">
               <h3 className="text-2xl font-bold text-white mb-2">Pro Annual</h3>
               <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-bold text-white">$144</span>
+                <span className="text-4xl font-bold text-white">{PRICING.annual.label}</span>
                 <span className="text-indigo-200">/year</span>
               </div>
-              <p className="text-indigo-200 text-sm mt-1">$12/month &mdash; save 20%</p>
+              <p className="text-indigo-200 text-sm mt-1">{PRICING.annual.perMonth}/month &mdash; save {PRICING.annual.savings}</p>
             </div>
 
             <ul className="space-y-4 mb-8">
