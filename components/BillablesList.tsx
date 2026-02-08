@@ -21,11 +21,15 @@ const BillablesList = forwardRef<BillablesListRef>((props, ref) => {
   const [page, setPage] = useState(0);
   const [duplicateModalOpen, setDuplicateModalOpen] = useState(false);
   const [billableToDuplicate, setBillableToDuplicate] = useState<Billable | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const supabase = createClient();
   const observerTarget = useRef<HTMLDivElement>(null);
   const isLoadingRef = useRef(false);
 
-  const fetchBillables = async (pageNum: number = 0, append: boolean = false) => {
+  const fetchBillables = async (pageNum: number = 0, append: boolean = false, uid?: string) => {
+    const currentUserId = uid || userId;
+    if (!currentUserId) return;
+
     try {
       if (append) {
         if (isLoadingRef.current) {
@@ -43,6 +47,7 @@ const BillablesList = forwardRef<BillablesListRef>((props, ref) => {
       const { data, error, count } = await supabase
         .from('billables')
         .select('*', { count: 'exact' })
+        .eq('user_id', currentUserId)
         .order('date', { ascending: false })
         .order('created_at', { ascending: false })
         .range(from, to);
@@ -76,62 +81,72 @@ const BillablesList = forwardRef<BillablesListRef>((props, ref) => {
   };
 
   const loadMore = useCallback(() => {
-    if (!loadingMore && hasMore && !isLoadingRef.current) {
+    if (!loadingMore && hasMore && !isLoadingRef.current && userId) {
       const nextPage = page + 1;
       setPage(nextPage);
-      fetchBillables(nextPage, true);
+      fetchBillables(nextPage, true, userId);
     }
-  }, [page, loadingMore, hasMore]);
+  }, [page, loadingMore, hasMore, userId]);
 
   // Expose refresh function to parent
   useImperativeHandle(ref, () => ({
     refresh: async () => {
       setPage(0);
       setHasMore(true);
-      await fetchBillables(0, false);
+      await fetchBillables(0, false, userId || undefined);
     },
   }));
 
   useEffect(() => {
-    fetchBillables();
+    let channel: ReturnType<typeof supabase.channel> | null = null;
 
-    // Set up real-time subscription
-    const channel = supabase
-      .channel('billables_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'billables',
-        },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            setBillables((current) => {
-              // Check if item already exists to prevent duplicates
-              const exists = current.some(billable => billable.id === payload.new.id);
-              if (exists) {
-                return current;
-              }
-              return [payload.new as Billable, ...current];
-            });
-          } else if (payload.eventType === 'UPDATE') {
-            setBillables((current) =>
-              current.map((billable) =>
-                billable.id === payload.new.id ? (payload.new as Billable) : billable
-              )
-            );
-          } else if (payload.eventType === 'DELETE') {
-            setBillables((current) =>
-              current.filter((billable) => billable.id !== payload.old.id)
-            );
+    const init = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      setUserId(user.id);
+      await fetchBillables(0, false, user.id);
+
+      // Set up real-time subscription filtered by user_id
+      channel = supabase
+        .channel('billables_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'billables',
+            filter: `user_id=eq.${user.id}`,
+          },
+          (payload) => {
+            if (payload.eventType === 'INSERT') {
+              setBillables((current) => {
+                const exists = current.some(billable => billable.id === payload.new.id);
+                if (exists) {
+                  return current;
+                }
+                return [payload.new as Billable, ...current];
+              });
+            } else if (payload.eventType === 'UPDATE') {
+              setBillables((current) =>
+                current.map((billable) =>
+                  billable.id === payload.new.id ? (payload.new as Billable) : billable
+                )
+              );
+            } else if (payload.eventType === 'DELETE') {
+              setBillables((current) =>
+                current.filter((billable) => billable.id !== payload.old.id)
+              );
+            }
           }
-        }
-      )
-      .subscribe();
+        )
+        .subscribe();
+    };
+
+    init();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) supabase.removeChannel(channel);
     };
   }, []);
 
@@ -184,7 +199,7 @@ const BillablesList = forwardRef<BillablesListRef>((props, ref) => {
     // Refresh the list after successful duplicate
     setPage(0);
     setHasMore(true);
-    fetchBillables(0, false);
+    fetchBillables(0, false, userId || undefined);
   };
 
   if (loading) {
