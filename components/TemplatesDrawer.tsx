@@ -238,7 +238,7 @@ export default function TemplatesDrawer({ isOpen, onClose, onApply, subscription
       />
 
       {/* Drawer */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-lg bg-white dark:bg-gray-800 shadow-xl z-50 transform transition-transform overflow-y-auto">
+      <div className="fixed right-0 top-0 h-full w-full max-w-[50vw] bg-white dark:bg-gray-800 shadow-xl z-50 transform transition-transform overflow-y-auto">
         <div className="p-6">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
