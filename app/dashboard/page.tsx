@@ -184,6 +184,7 @@ export default function DashboardPage() {
       <AnalyzeDrawer
         isOpen={isAnalyzeDrawerOpen}
         onClose={() => setIsAnalyzeDrawerOpen(false)}
+        isPro={subscription?.tier === 'pro' && ['active', 'trialing'].includes(subscription.status)}
       />
 
       {/* Email Estimate Modal */}
