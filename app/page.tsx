@@ -104,6 +104,90 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* Templates & AI Section */}
+        <div className="py-16 lg:py-24">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              Work Smarter, Not Harder
+            </h3>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Save hours every week with reusable templates and AI-powered time estimates.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {/* Templates */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center mb-5">
+                <svg className="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                </svg>
+              </div>
+              <h4 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+                Reusable Templates
+              </h4>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                Stop typing the same client, matter, and description over and over. Save your most common billing entries as templates and apply them with one click.
+              </p>
+              <ul className="space-y-2 text-gray-600 dark:text-gray-400 text-sm">
+                <li className="flex items-start gap-2">
+                  <svg className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Pre-fill client, matter, hours, and description instantly
+                </li>
+                <li className="flex items-start gap-2">
+                  <svg className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Organize with tags for quick filtering
+                </li>
+                <li className="flex items-start gap-2">
+                  <svg className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Search and apply directly from the entry form
+                </li>
+              </ul>
+            </div>
+
+            {/* AI Estimates */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-5">
+                <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              </div>
+              <h4 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+                AI-Powered Estimates
+              </h4>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                Let AI analyze your email chains and documents to generate accurate billable hour estimates and work descriptions automatically.
+              </p>
+              <ul className="space-y-2 text-gray-600 dark:text-gray-400 text-sm">
+                <li className="flex items-start gap-2">
+                  <svg className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Paste an email chain and get hours + description
+                </li>
+                <li className="flex items-start gap-2">
+                  <svg className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Upload documents for in-depth time analysis
+                </li>
+                <li className="flex items-start gap-2">
+                  <svg className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Review and adjust before submitting
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
         {/* Pricing Teaser */}
         <div className="py-16 text-center">
           <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
