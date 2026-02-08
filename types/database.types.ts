@@ -36,6 +36,75 @@ export interface Database {
           updated_at?: string;
         };
       };
+      templates: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          client: string | null;
+          matter: string | null;
+          time_amount: number | null;
+          description: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          client?: string | null;
+          matter?: string | null;
+          time_amount?: number | null;
+          description?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          client?: string | null;
+          matter?: string | null;
+          time_amount?: number | null;
+          description?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      template_tags: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          created_at?: string;
+        };
+      };
+      template_tag_assignments: {
+        Row: {
+          template_id: string;
+          tag_id: string;
+        };
+        Insert: {
+          template_id: string;
+          tag_id: string;
+        };
+        Update: {
+          template_id?: string;
+          tag_id?: string;
+        };
+      };
       subscriptions: {
         Row: {
           id: string;
@@ -119,3 +188,12 @@ export type BillableUpdate = Database['public']['Tables']['billables']['Update']
 export type Subscription = Database['public']['Tables']['subscriptions']['Row'];
 export type SubscriptionInsert = Database['public']['Tables']['subscriptions']['Insert'];
 export type SubscriptionUpdate = Database['public']['Tables']['subscriptions']['Update'];
+export type Template = Database['public']['Tables']['templates']['Row'];
+export type TemplateInsert = Database['public']['Tables']['templates']['Insert'];
+export type TemplateUpdate = Database['public']['Tables']['templates']['Update'];
+export type TemplateTag = Database['public']['Tables']['template_tags']['Row'];
+export type TemplateTagInsert = Database['public']['Tables']['template_tags']['Insert'];
+
+export type TemplateWithTags = Template & {
+  tags: TemplateTag[];
+};

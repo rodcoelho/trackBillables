@@ -118,6 +118,7 @@ export default function HomePage() {
               <ul className="space-y-3 text-gray-600 dark:text-gray-400 mb-6">
                 <li>✓ 50 billable entries/month</li>
                 <li>✓ 1 export per month</li>
+                <li>✓ 3 reusable templates</li>
                 <li>✓ Basic analytics</li>
               </ul>
               <Link
@@ -135,6 +136,7 @@ export default function HomePage() {
               <ul className="space-y-3 text-gray-600 dark:text-gray-400 mb-6">
                 <li>✓ Unlimited billable entries</li>
                 <li>✓ Unlimited exports</li>
+                <li>✓ Unlimited templates</li>
                 <li>✓ Advanced analytics</li>
                 <li>✓ AI-powered billable hour estimates</li>
                 <li>✓ Priority support</li>
@@ -159,6 +161,7 @@ export default function HomePage() {
               <ul className="space-y-3 text-white mb-6">
                 <li>✓ Unlimited billable entries</li>
                 <li>✓ Unlimited exports</li>
+                <li>✓ Unlimited templates</li>
                 <li>✓ Advanced analytics</li>
                 <li>✓ AI-powered billable hour estimates</li>
                 <li>✓ Priority support</li>

@@ -2,18 +2,22 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import type { Subscription } from '@/types/database.types';
+import TemplateSelector from '@/components/TemplateSelector';
+import type { Subscription, TemplateWithTags } from '@/types/database.types';
 
 interface AddBillableFormProps {
   onSuccess?: () => void;
   prefilledHours?: number;
   prefilledDescription?: string;
+  prefilledClient?: string;
+  prefilledMatter?: string;
   onEmailEstimateClick?: () => void;
   onDocumentEstimateClick?: () => void;
   showAiEstimate?: boolean;
+  onTemplateApply?: (template: TemplateWithTags) => void;
 }
 
-export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDescription, onEmailEstimateClick, onDocumentEstimateClick, showAiEstimate }: AddBillableFormProps) {
+export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDescription, prefilledClient, prefilledMatter, onEmailEstimateClick, onDocumentEstimateClick, showAiEstimate, onTemplateApply }: AddBillableFormProps) {
   const [date, setDate] = useState(() => {
     const today = new Date();
     const year = today.getFullYear();
@@ -33,7 +37,7 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
   const supabase = createClient();
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
 
-  // Update form when prefilled values change (from email estimate)
+  // Update form when prefilled values change (from email estimate or template)
   useEffect(() => {
     if (prefilledHours !== undefined) {
       setTimeAmount(prefilledHours.toString());
@@ -42,6 +46,18 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
       setDescription(prefilledDescription);
     }
   }, [prefilledHours, prefilledDescription]);
+
+  useEffect(() => {
+    if (prefilledClient !== undefined) {
+      setClient(prefilledClient);
+    }
+  }, [prefilledClient]);
+
+  useEffect(() => {
+    if (prefilledMatter !== undefined) {
+      setMatter(prefilledMatter);
+    }
+  }, [prefilledMatter]);
 
   // Auto-resize description textarea
   useEffect(() => {
@@ -280,7 +296,7 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
             />
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
             {showAiEstimate && (
               <div className="relative">
                 <button
@@ -340,6 +356,11 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
                   </>
                 )}
               </div>
+            )}
+            {onTemplateApply && (
+              <TemplateSelector
+                onSelect={(template) => onTemplateApply(template)}
+              />
             )}
             <button
               type="submit"

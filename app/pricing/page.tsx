@@ -74,6 +74,7 @@ function PricingPageContent() {
   const proFeatures = [
     'Unlimited billable entries',
     'Unlimited exports',
+    'Unlimited templates',
     'Advanced analytics & insights',
     'AI-powered billable hour estimates',
     'Priority support',
@@ -122,6 +123,10 @@ function PricingPageContent() {
               <li className="flex items-start gap-3">
                 <CheckIcon className="text-green-500" />
                 <span className="text-gray-700 dark:text-gray-300">Basic analytics</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckIcon className="text-green-500" />
+                <span className="text-gray-700 dark:text-gray-300">Up to 3 templates</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckIcon className="text-green-500" />

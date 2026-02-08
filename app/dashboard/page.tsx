@@ -11,7 +11,8 @@ import UpgradeBanner from '@/components/UpgradeBanner';
 import UserMenu from '@/components/UserMenu';
 import EmailEstimateModal from '@/components/EmailEstimateModal';
 import DocumentEstimateModal from '@/components/DocumentEstimateModal';
-import type { Subscription } from '@/types/database.types';
+import TemplatesDrawer from '@/components/TemplatesDrawer';
+import type { Subscription, TemplateWithTags } from '@/types/database.types';
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
@@ -21,8 +22,11 @@ export default function DashboardPage() {
   const [isAnalyzeDrawerOpen, setIsAnalyzeDrawerOpen] = useState(false);
   const [isEmailEstimateOpen, setIsEmailEstimateOpen] = useState(false);
   const [isDocumentEstimateOpen, setIsDocumentEstimateOpen] = useState(false);
+  const [isTemplatesDrawerOpen, setIsTemplatesDrawerOpen] = useState(false);
   const [prefilledHours, setPrefilledHours] = useState<number | undefined>(undefined);
   const [prefilledDescription, setPrefilledDescription] = useState<string | undefined>(undefined);
+  const [prefilledClient, setPrefilledClient] = useState<string | undefined>(undefined);
+  const [prefilledMatter, setPrefilledMatter] = useState<string | undefined>(undefined);
   const router = useRouter();
   const supabase = createClient();
   const billablesListRef = useRef<BillablesListRef>(null);
@@ -61,12 +65,21 @@ export default function DashboardPage() {
     // Clear prefilled values after successful add
     setPrefilledHours(undefined);
     setPrefilledDescription(undefined);
+    setPrefilledClient(undefined);
+    setPrefilledMatter(undefined);
   };
 
   const handleEstimateGenerated = (hours: number, description: string) => {
     // Set the prefilled values
     setPrefilledHours(hours);
     setPrefilledDescription(description);
+  };
+
+  const handleTemplateApply = (template: TemplateWithTags) => {
+    if (template.client) setPrefilledClient(template.client);
+    if (template.matter) setPrefilledMatter(template.matter);
+    if (template.time_amount) setPrefilledHours(template.time_amount);
+    if (template.description) setPrefilledDescription(template.description);
   };
 
   if (loading) {
@@ -118,6 +131,15 @@ export default function DashboardPage() {
               Analyze
             </button>
             <button
+              onClick={() => setIsTemplatesDrawerOpen(true)}
+              className="px-4 py-2 bg-amber-600 text-white font-medium rounded-md hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+              </svg>
+              Templates
+            </button>
+            <button
               onClick={() => setIsExportDrawerOpen(true)}
               className="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors flex items-center gap-2"
             >
@@ -139,9 +161,12 @@ export default function DashboardPage() {
             onSuccess={handleBillableAdded}
             prefilledHours={prefilledHours}
             prefilledDescription={prefilledDescription}
+            prefilledClient={prefilledClient}
+            prefilledMatter={prefilledMatter}
             onEmailEstimateClick={() => setIsEmailEstimateOpen(true)}
             onDocumentEstimateClick={() => setIsDocumentEstimateOpen(true)}
             showAiEstimate={subscription?.tier === 'pro' && ['active', 'trialing'].includes(subscription.status)}
+            onTemplateApply={handleTemplateApply}
           />
         </div>
 
@@ -180,6 +205,14 @@ export default function DashboardPage() {
       <ExportDrawer
         isOpen={isExportDrawerOpen}
         onClose={() => setIsExportDrawerOpen(false)}
+      />
+
+      {/* Templates Drawer */}
+      <TemplatesDrawer
+        isOpen={isTemplatesDrawerOpen}
+        onClose={() => setIsTemplatesDrawerOpen(false)}
+        onApply={handleTemplateApply}
+        subscription={subscription}
       />
     </div>
   );

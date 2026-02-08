@@ -10,6 +10,7 @@ function BillingPageContent() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [templatesCount, setTemplatesCount] = useState(0);
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
@@ -30,6 +31,7 @@ function BillingPageContent() {
       router.push('/login');
     } else {
       await fetchSubscription();
+      await fetchTemplatesCount();
     }
   };
 
@@ -44,6 +46,18 @@ function BillingPageContent() {
       console.error('Failed to fetch subscription:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchTemplatesCount = async () => {
+    try {
+      const response = await fetch('/api/templates');
+      if (response.ok) {
+        const data = await response.json();
+        setTemplatesCount(data.templates?.length || 0);
+      }
+    } catch (err) {
+      console.error('Failed to fetch templates count:', err);
     }
   };
 
@@ -145,7 +159,7 @@ function BillingPageContent() {
             )}
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4 mt-6">
+          <div className="grid md:grid-cols-3 gap-4 mt-6">
             <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Entries This Month</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -158,6 +172,16 @@ function BillingPageContent() {
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 {subscription?.exports_count_current_month || 0}
                 {!isPro && <span className="text-sm text-gray-500"> / 1</span>}
+              </p>
+            </div>
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Templates</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {templatesCount}
+                {isPro
+                  ? <span className="text-sm text-gray-500"> / &infin;</span>
+                  : <span className="text-sm text-gray-500"> / 3</span>
+                }
               </p>
             </div>
           </div>
