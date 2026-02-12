@@ -1,8 +1,21 @@
 {
   "manifest_version": 3,
-  "name": "TrackBillables New Tab",
-  "version": "1.0",
-  "description": "Opens TrackBillables when you open a new tab.",
+  "name": "TrackBillables",
+  "version": "2.0",
+  "description": "Reminder timer and stopwatch to remind you to track your billable hours. Opens TrackBillables on every new tab.",
+  "permissions": ["alarms", "storage", "tabs", "offscreen"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "TrackBillables Timer"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   },

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <span class="title">TrackBillables</span>
+    <a id="open-app" class="open-app">Open App</a>
+  </div>
+
+  <!-- Mode Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-mode="reminder">Reminder</button>
+    <button class="tab" data-mode="stopwatch">Stopwatch</button>
+    <button class="tab" data-mode="off">Off</button>
+  </div>
+
+  <!-- Reminder Panel -->
+  <div id="panel-reminder" class="panel">
+    <div class="interval-selector" id="interval-selector">
+      <button class="interval-btn" data-minutes="15">15m</button>
+      <button class="interval-btn active" data-minutes="30">30m</button>
+      <div class="custom-interval">
+        <input type="number" id="custom-minutes" placeholder="Min" min="1" max="480">
+      </div>
+    </div>
+
+    <!-- Alert Style -->
+    <div class="alert-style-section">
+      <label class="alert-style-label">Alert style</label>
+      <div class="segmented-control" id="alert-style">
+        <button class="seg-btn active" data-notify="sound">Sound</button>
+        <button class="seg-btn" data-notify="popup">Open tab</button>
+        <button class="seg-btn" data-notify="both">Both</button>
+      </div>
+    </div>
+
+    <!-- Work Hours Schedule -->
+    <div class="schedule-section">
+      <div class="schedule-toggle">
+        <label class="toggle-label">
+          <span>Auto-run during work hours</span>
+          <input type="checkbox" id="schedule-enabled">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="schedule-config hidden" id="schedule-config">
+        <div class="schedule-row">
+          <label>Hours</label>
+          <div class="time-inputs">
+            <input type="time" id="schedule-start" value="09:00">
+            <span>to</span>
+            <input type="time" id="schedule-end" value="17:00">
+          </div>
+        </div>
+        <div class="schedule-row">
+          <label>Timezone</label>
+          <select id="schedule-timezone"></select>
+        </div>
+        <div class="schedule-row">
+          <label>Days</label>
+          <div class="day-picker" id="day-picker">
+            <button class="day-btn" data-day="0">S</button>
+            <button class="day-btn active" data-day="1">M</button>
+            <button class="day-btn active" data-day="2">T</button>
+            <button class="day-btn active" data-day="3">W</button>
+            <button class="day-btn active" data-day="4">T</button>
+            <button class="day-btn active" data-day="5">F</button>
+            <button class="day-btn" data-day="6">S</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="schedule-status" class="schedule-status hidden"></div>
+
+    <div class="timer-display" id="reminder-display">30:00</div>
+    <div class="controls" id="reminder-controls">
+      <button class="btn btn-start" id="reminder-start">Start</button>
+      <button class="btn btn-stop hidden" id="reminder-stop">Stop</button>
+    </div>
+  </div>
+
+  <!-- Stopwatch Panel -->
+  <div id="panel-stopwatch" class="panel hidden">
+    <div class="timer-display" id="stopwatch-display">0:00:00</div>
+    <div class="controls">
+      <button class="btn btn-start" id="stopwatch-start">Start</button>
+      <button class="btn btn-stop hidden" id="stopwatch-stop">Stop</button>
+      <button class="btn btn-reset hidden" id="stopwatch-reset">Reset</button>
+    </div>
+    <p class="hint">Badge flashes every 15 min as a reminder.</p>
+  </div>
+
+  <!-- Off Panel -->
+  <div id="panel-off" class="panel hidden">
+    <p class="off-message">Timer is off. Select Reminder or Stopwatch to start tracking reminders.</p>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
