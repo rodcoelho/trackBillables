@@ -36,6 +36,15 @@ async function getState() {
     if (state.mode === 'pomodoro') state.mode = 'reminder';
     await setState(state);
   }
+  // Ensure reminder object always exists
+  if (!state.reminder) {
+    state.reminder = { ...DEFAULT_STATE.reminder, schedule: { ...DEFAULT_STATE.reminder.schedule } };
+    await setState(state);
+  }
+  if (!state.reminder.schedule) {
+    state.reminder.schedule = { ...DEFAULT_STATE.reminder.schedule };
+    await setState(state);
+  }
   return state;
 }
 
