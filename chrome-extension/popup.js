@@ -172,14 +172,14 @@ function updateUI(state) {
 
   // Start/stop tick interval
   clearInterval(tickInterval);
-  if ((state.mode === 'reminder' && state.reminder.running) ||
-      (state.mode === 'stopwatch' && state.stopwatch.running)) {
+  if ((state.mode === 'reminder' && state.reminder && state.reminder.running) ||
+      (state.mode === 'stopwatch' && state.stopwatch && state.stopwatch.running)) {
     tickInterval = setInterval(() => tick(), 1000);
   }
 }
 
 function updateReminderUI(state) {
-  const rem = state.reminder;
+  const rem = state.reminder || {};
   const schedule = rem.schedule || {};
   const scheduleOn = schedule.enabled;
 
@@ -295,7 +295,7 @@ function updateStopwatchUI(state) {
 function tick() {
   if (!currentState) return;
 
-  if (currentState.mode === 'reminder' && currentState.reminder.running) {
+  if (currentState.mode === 'reminder' && currentState.reminder && currentState.reminder.running) {
     const elapsed = Date.now() - currentState.reminder.startedAt;
     const total = currentState.reminder.intervalMinutes * 60 * 1000;
     const remaining = Math.max(0, total - elapsed);
