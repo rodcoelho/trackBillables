@@ -63,7 +63,7 @@ export default function ChatEstimateModal({
         <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              LLM Chat Time Estimate
+              AI Chat Time Estimate
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               Paste a chat history to estimate billable hours using AI
@@ -98,11 +98,11 @@ export default function ChatEstimateModal({
               value={chatHistory}
               onChange={(e) => setChatHistory(e.target.value)}
               rows={16}
-              placeholder={`Paste your LLM chat history here...\n\nExample:\nUser: Can you help me refactor this authentication module to use JWT tokens instead of sessions?\n\nAssistant: Sure! Here's how we can approach the JWT refactor...\n\nUser: What about refresh token rotation?\n\nAssistant: Great question. For refresh token rotation...`}
+              placeholder={`Paste your AI chat history here...\n\nExample:\nUser: Can you summarize the key obligations under Section 4 of the lease agreement for my client?\n\nAssistant: Based on Section 4 of the lease agreement, your client's key obligations include...\n\nUser: Are there any potential liability issues if the tenant fails to maintain insurance?\n\nAssistant: Yes, there are several liability concerns to consider...`}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white font-mono text-sm resize-none"
             />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Include the full chat conversation with all user messages and LLM responses for accurate estimation.
+              Include the full chat conversation with all user messages and AI responses for accurate estimation.
             </p>
           </div>
 

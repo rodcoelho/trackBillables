@@ -405,7 +405,7 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
                           if (isPro) {
                             onChatEstimateClick?.();
                           } else {
-                            setUpgradeMessage('AI Chat Estimates are a Pro feature. Upgrade to analyze LLM chat histories and auto-fill billable entries.');
+                            setUpgradeMessage('AI Chat Estimates are a Pro feature. Upgrade to analyze AI chat histories and auto-fill billable entries.');
                             setShowUpgradePrompt(true);
                           }
                         }}
@@ -415,7 +415,7 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                         </svg>
                         <div className="flex-1">
-                          <div className={`font-medium ${isPro ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>LLM Chat</div>
+                          <div className={`font-medium ${isPro ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>AI Chat</div>
                           <div className="text-xs text-gray-500 dark:text-gray-400">Analyze chat history</div>
                         </div>
                         {!isPro && (
