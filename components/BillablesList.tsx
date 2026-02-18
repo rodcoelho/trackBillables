@@ -180,11 +180,17 @@ const BillablesList = forwardRef<BillablesListRef>((props, ref) => {
   }, [hasMore, loadingMore, loadMore, billables.length]);
 
   const handleDelete = async (id: string) => {
+    // Optimistically remove from UI immediately
+    const previous = billables;
+    setBillables((current) => current.filter((b) => b.id !== id));
+
     try {
       const { error } = await supabase.from('billables').delete().eq('id', id);
 
       if (error) throw error;
     } catch (err) {
+      // Restore on failure
+      setBillables(previous);
       console.error('Error deleting billable:', err);
       alert('Failed to delete billable. Please try again.');
     }
