@@ -158,9 +158,9 @@ export default function CreateTemplateModal({ isOpen, onClose, onSave, editTempl
               />
             </div>
 
-            {/* Client & Matter */}
+            {/* Client, Matter & Hours */}
             <div className="flex gap-4">
-              <div style={{ width: '35%' }}>
+              <div style={{ width: '30%' }}>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Client
                 </label>
@@ -183,23 +183,21 @@ export default function CreateTemplateModal({ isOpen, onClose, onSave, editTempl
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 dark:bg-gray-700 dark:text-white"
                 />
               </div>
-            </div>
-
-            {/* Hours */}
-            <div style={{ width: '25%' }}>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Hours
-              </label>
-              <input
-                type="number"
-                step="0.1"
-                min="0.1"
-                max="24"
-                value={timeAmount}
-                onChange={(e) => setTimeAmount(e.target.value)}
-                placeholder="e.g., 1.5"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 dark:bg-gray-700 dark:text-white"
-              />
+              <div style={{ width: '15%' }}>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Hours
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0.1"
+                  max="24"
+                  value={timeAmount}
+                  onChange={(e) => setTimeAmount(e.target.value)}
+                  placeholder="e.g., 1.5"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 dark:bg-gray-700 dark:text-white"
+                />
+              </div>
             </div>
 
             {/* Description */}
@@ -210,7 +208,7 @@ export default function CreateTemplateModal({ isOpen, onClose, onSave, editTempl
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                rows={3}
+                rows={6}
                 placeholder="Work description to pre-fill..."
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 dark:bg-gray-700 dark:text-white resize-none"
               />
