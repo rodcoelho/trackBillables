@@ -97,7 +97,17 @@ async function handleReminderFire(state) {
     await playChime();
   }
   if (notifyType === 'popup' || notifyType === 'both') {
-    chrome.tabs.create({ url: 'https://trackbillables.com' });
+    // Reuse an existing TrackBillables tab if one is open
+    chrome.tabs.query({ url: 'https://trackbillables.com/*' }, (tabs) => {
+      if (tabs.length > 0) {
+        chrome.tabs.update(tabs[0].id, { active: true });
+        if (tabs[0].windowId) {
+          chrome.windows.update(tabs[0].windowId, { focused: true });
+        }
+      } else {
+        chrome.tabs.create({ url: 'https://trackbillables.com' });
+      }
+    });
   }
 
   // Reschedule for next interval
