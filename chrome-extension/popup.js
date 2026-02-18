@@ -30,7 +30,6 @@ const scheduleConfig = $('#schedule-config');
 const scheduleStart = $('#schedule-start');
 const scheduleEnd = $('#schedule-end');
 const scheduleTz = $('#schedule-timezone');
-const dayBtns = $$('.day-btn');
 const scheduleStatus = $('#schedule-status');
 const reminderControls = $('#reminder-controls');
 const intervalSelector = $('#interval-selector');
@@ -124,18 +123,11 @@ function populateTimezones() {
 }
 
 function getScheduleFromUI() {
-  const days = [];
-  dayBtns.forEach((btn) => {
-    if (btn.classList.contains('active')) {
-      days.push(parseInt(btn.dataset.day));
-    }
-  });
   return {
     enabled: scheduleEnabled.checked,
     startTime: scheduleStart.value || '09:00',
     endTime: scheduleEnd.value || '17:00',
-    timezone: scheduleTz.value,
-    days
+    timezone: scheduleTz.value
   };
 }
 
@@ -199,10 +191,6 @@ function updateReminderUI(state) {
     if (schedule.timezone) {
       scheduleTz.value = schedule.timezone;
     }
-    dayBtns.forEach((btn) => {
-      const day = parseInt(btn.dataset.day);
-      btn.classList.toggle('active', (schedule.days || []).includes(day));
-    });
   }
 
   // Interval buttons (always visible for setting interval)
@@ -395,14 +383,6 @@ scheduleEnabled.addEventListener('change', () => {
 scheduleStart.addEventListener('change', sendScheduleUpdate);
 scheduleEnd.addEventListener('change', sendScheduleUpdate);
 scheduleTz.addEventListener('change', sendScheduleUpdate);
-
-// Day picker buttons
-dayBtns.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    btn.classList.toggle('active');
-    sendScheduleUpdate();
-  });
-});
 
 // Open app
 openAppLink.addEventListener('click', () => {

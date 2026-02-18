@@ -12,8 +12,7 @@ const DEFAULT_STATE = {
       enabled: false,
       startTime: '09:00',
       endTime: '17:00',
-      timezone: '',
-      days: [1, 2, 3, 4, 5]
+      timezone: ''
     }
   },
   stopwatch: {
@@ -153,17 +152,11 @@ function isWithinWorkHours(schedule) {
     timeZone: tz,
     hour: 'numeric',
     minute: 'numeric',
-    hour12: false,
-    weekday: 'short'
+    hour12: false
   });
   const parts = formatter.formatToParts(now);
   const hour = parseInt(parts.find(p => p.type === 'hour').value);
   const minute = parseInt(parts.find(p => p.type === 'minute').value);
-  const weekdayStr = parts.find(p => p.type === 'weekday').value;
-
-  const dayMap = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
-  const currentDay = dayMap[weekdayStr];
-  if (!schedule.days.includes(currentDay)) return false;
 
   const currentMinutes = hour * 60 + minute;
   const [startH, startM] = schedule.startTime.split(':').map(Number);
@@ -337,7 +330,6 @@ async function handleScheduleUpdate(state, schedule) {
   state.reminder.schedule.startTime = schedule.startTime || '09:00';
   state.reminder.schedule.endTime = schedule.endTime || '17:00';
   state.reminder.schedule.timezone = schedule.timezone || '';
-  state.reminder.schedule.days = schedule.days || [1, 2, 3, 4, 5];
 
   await chrome.alarms.clear('schedule-check');
 
