@@ -117,7 +117,15 @@
 - **Row Limit:** Maximum 100,000 rows per export
 - **Batch Processing:** Handles large datasets in 1000-row batches
 
-### 5. UI/UX Features
+### 5. AI Time Estimates (Pro Feature)
+- **Email Estimate:** Paste an email chain, AI analyzes attorney messages and estimates billable hours
+- **Document Estimate:** Upload up to 15 documents for AI-powered time estimation
+- **LLM Chat Estimate:** Paste an LLM chat history (e.g., ChatGPT, Claude) and AI estimates time spent composing prompts, reading responses, and analyzing output
+- All estimate types return billable hours and a description that prefill the Add Billable form
+- Uses Claude 3 Haiku for fast, cost-effective analysis
+- Accessible via the "Estimate" dropdown button in the Add Billable form
+
+### 6. UI/UX Features
 - **Dark Mode:** Automatic system preference detection
 - **Mobile Responsive:** Works on desktop, tablet, and mobile
 - **Loading States:** Spinners and loading indicators
@@ -136,6 +144,12 @@ trackBillables/
 │   │   ├── analytics/
 │   │   │   └── last-7-days/
 │   │   │       └── route.ts      # Analytics API endpoint
+│   │   ├── email-estimate/
+│   │   │   └── route.ts          # AI email time estimation endpoint
+│   │   ├── document-estimate/
+│   │   │   └── route.ts          # AI document time estimation endpoint
+│   │   ├── chat-estimate/
+│   │   │   └── route.ts          # AI LLM chat time estimation endpoint
 │   │   └── export/
 │   │       └── route.ts          # Export API endpoint (CSV/XLSX)
 │   ├── auth/
@@ -154,6 +168,9 @@ trackBillables/
 │   ├── AnalyzeDrawer.tsx         # Right-side drawer with analytics
 │   ├── BillableItem.tsx          # Individual billable entry with inline edit
 │   ├── BillablesList.tsx         # List with real-time updates
+│   ├── EmailEstimateModal.tsx    # Modal for AI email time estimation
+│   ├── DocumentEstimateModal.tsx # Modal for AI document time estimation
+│   ├── ChatEstimateModal.tsx     # Modal for AI LLM chat time estimation
 │   ├── ExportDrawer.tsx          # Right-side drawer for export options
 │   └── SignOutButton.tsx         # Sign out button component
 │
@@ -347,7 +364,37 @@ trackBillables/
 
 ## API Routes
 
-### 1. `/api/analytics/last-7-days` (GET)
+### 1. `/api/chat-estimate` (POST)
+
+**Purpose:** Estimates billable time from a pasted LLM chat history
+
+**Authentication:** Required (401 if not authenticated)
+**Pro Gate:** Required (403 with `upgrade: true` if not Pro)
+
+**Request Body:**
+```json
+{
+  "chat_history": "User: Can you help me...\nAssistant: Sure!..."
+}
+```
+
+**Response:**
+```json
+{
+  "billable_hours": 0.5,
+  "description": "Researched JWT authentication approach and implemented token refresh logic with Claude assistance."
+}
+```
+
+**Estimation Logic:**
+- User messages: 0.1-0.5 hours based on length/complexity
+- LLM responses: 0.1-0.5 hours for reading/analyzing
+- Additional time for testing/implementing suggestions
+- Uses 0.1-hour (6-minute) increments
+
+---
+
+### 2. `/api/analytics/last-7-days` (GET)
 
 **Purpose:** Returns analytics for the last 7 days including today
 

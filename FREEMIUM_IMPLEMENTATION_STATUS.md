@@ -29,7 +29,16 @@
 - ✅ Usage counters automatically increment
 - ✅ Monthly reset logic in place
 
-### 4. Frontend Components
+### 4. AI Estimate Features (Pro Only)
+- ✅ Email estimate: Analyze email chains for billable time
+- ✅ Document estimate: Upload documents for billable time analysis
+- ✅ LLM Chat estimate: Paste chat histories for billable time estimation
+- ✅ All estimates use Claude 3 Haiku for cost-effective analysis
+- ✅ Results prefill hours and description in the Add Billable form
+- ✅ PRO badge shown on estimate options for free users
+- ✅ Upgrade prompt when free users click estimate options
+
+### 5. Frontend Components
 - ✅ Updated `AddBillableForm.tsx` with:
   - Usage display (X of 50 entries remaining)
   - Upgrade modal when limit reached
@@ -313,10 +322,16 @@ Once testing is complete:
 - `app/api/stripe/portal/route.ts` - Customer portal redirect
 - `app/api/subscription/route.ts` - Get current subscription
 - `app/api/export/route.ts` (updated with export limits)
+- `app/api/email-estimate/route.ts` - AI email time estimation
+- `app/api/document-estimate/route.ts` - AI document time estimation
+- `app/api/chat-estimate/route.ts` - AI LLM chat time estimation
 
 ### Components
-- `components/AddBillableForm.tsx` (updated with entry limits)
+- `components/AddBillableForm.tsx` (updated with entry limits + AI estimate dropdown)
 - `components/ExportDrawer.tsx` (updated with export limits)
+- `components/EmailEstimateModal.tsx` - AI email time estimation
+- `components/DocumentEstimateModal.tsx` - AI document time estimation
+- `components/ChatEstimateModal.tsx` - AI LLM chat time estimation
 
 ### Environment Variables
 - `.env.local` - All secrets configured

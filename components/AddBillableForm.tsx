@@ -16,12 +16,13 @@ interface AddBillableFormProps {
   prefilledMatter?: string;
   onEmailEstimateClick?: () => void;
   onDocumentEstimateClick?: () => void;
+  onChatEstimateClick?: () => void;
   showAiEstimate?: boolean;
   isPro?: boolean;
   onTemplateApply?: (template: TemplateWithTags) => void;
 }
 
-export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDescription, prefilledClient, prefilledClientId, prefilledMatter, onEmailEstimateClick, onDocumentEstimateClick, showAiEstimate, isPro, onTemplateApply }: AddBillableFormProps) {
+export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDescription, prefilledClient, prefilledClientId, prefilledMatter, onEmailEstimateClick, onDocumentEstimateClick, onChatEstimateClick, showAiEstimate, isPro, onTemplateApply }: AddBillableFormProps) {
   const [date, setDate] = useState(() => {
     const today = new Date();
     const year = today.getFullYear();
@@ -384,7 +385,7 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
                             setShowUpgradePrompt(true);
                           }
                         }}
-                        className={`w-full text-left px-4 py-3 transition-colors flex items-center gap-3 ${isPro ? 'hover:bg-purple-50 dark:hover:bg-purple-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                        className={`w-full text-left px-4 py-3 transition-colors flex items-center gap-3 border-b border-gray-100 dark:border-gray-700 ${isPro ? 'hover:bg-purple-50 dark:hover:bg-purple-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}`}
                       >
                         <svg className={`w-5 h-5 ${isPro ? 'text-purple-600 dark:text-purple-400' : 'text-gray-400 dark:text-gray-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -392,6 +393,30 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
                         <div className="flex-1">
                           <div className={`font-medium ${isPro ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>Document</div>
                           <div className="text-xs text-gray-500 dark:text-gray-400">Upload up to 15 docs</div>
+                        </div>
+                        {!isPro && (
+                          <span className="text-xs font-semibold text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/30 px-2 py-0.5 rounded-full">PRO</span>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowAiDropdown(false);
+                          if (isPro) {
+                            onChatEstimateClick?.();
+                          } else {
+                            setUpgradeMessage('AI Chat Estimates are a Pro feature. Upgrade to analyze LLM chat histories and auto-fill billable entries.');
+                            setShowUpgradePrompt(true);
+                          }
+                        }}
+                        className={`w-full text-left px-4 py-3 transition-colors flex items-center gap-3 ${isPro ? 'hover:bg-purple-50 dark:hover:bg-purple-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                      >
+                        <svg className={`w-5 h-5 ${isPro ? 'text-purple-600 dark:text-purple-400' : 'text-gray-400 dark:text-gray-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        <div className="flex-1">
+                          <div className={`font-medium ${isPro ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>LLM Chat</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">Analyze chat history</div>
                         </div>
                         {!isPro && (
                           <span className="text-xs font-semibold text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/30 px-2 py-0.5 rounded-full">PRO</span>

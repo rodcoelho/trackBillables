@@ -11,6 +11,7 @@ A modern, full-stack web application for tracking billable hours and managing cl
 - **Inline Editing**: Click to edit any entry directly in the list
 - **Mobile Responsive**: Works seamlessly on desktop, tablet, and mobile devices
 - **Dark Mode Support**: Automatically adapts to your system preferences
+- **AI Time Estimates**: Estimate billable hours from email chains, documents, or LLM chat histories (Pro)
 - **Secure**: Row-level security (RLS) ensures users only access their own data
 
 ## Tech Stack

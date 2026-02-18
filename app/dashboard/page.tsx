@@ -11,6 +11,7 @@ import UpgradeBanner from '@/components/UpgradeBanner';
 import UserMenu from '@/components/UserMenu';
 import EmailEstimateModal from '@/components/EmailEstimateModal';
 import DocumentEstimateModal from '@/components/DocumentEstimateModal';
+import ChatEstimateModal from '@/components/ChatEstimateModal';
 import TemplatesDrawer from '@/components/TemplatesDrawer';
 import type { Subscription, TemplateWithTags } from '@/types/database.types';
 
@@ -22,6 +23,7 @@ export default function DashboardPage() {
   const [isAnalyzeDrawerOpen, setIsAnalyzeDrawerOpen] = useState(false);
   const [isEmailEstimateOpen, setIsEmailEstimateOpen] = useState(false);
   const [isDocumentEstimateOpen, setIsDocumentEstimateOpen] = useState(false);
+  const [isChatEstimateOpen, setIsChatEstimateOpen] = useState(false);
   const [isTemplatesDrawerOpen, setIsTemplatesDrawerOpen] = useState(false);
   const [prefilledHours, setPrefilledHours] = useState<number | undefined>(undefined);
   const [prefilledDescription, setPrefilledDescription] = useState<string | undefined>(undefined);
@@ -169,6 +171,7 @@ export default function DashboardPage() {
             prefilledMatter={prefilledMatter}
             onEmailEstimateClick={() => setIsEmailEstimateOpen(true)}
             onDocumentEstimateClick={() => setIsDocumentEstimateOpen(true)}
+            onChatEstimateClick={() => setIsChatEstimateOpen(true)}
             showAiEstimate={true}
             isPro={subscription?.tier === 'pro' && ['active', 'trialing'].includes(subscription.status)}
             onTemplateApply={handleTemplateApply}
@@ -203,6 +206,14 @@ export default function DashboardPage() {
       <DocumentEstimateModal
         isOpen={isDocumentEstimateOpen}
         onClose={() => setIsDocumentEstimateOpen(false)}
+        onEstimateGenerated={handleEstimateGenerated}
+        subscription={subscription}
+      />
+
+      {/* Chat Estimate Modal */}
+      <ChatEstimateModal
+        isOpen={isChatEstimateOpen}
+        onClose={() => setIsChatEstimateOpen(false)}
         onEstimateGenerated={handleEstimateGenerated}
         subscription={subscription}
       />
