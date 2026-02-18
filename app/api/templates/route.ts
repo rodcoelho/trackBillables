@@ -78,7 +78,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, client, matter, time_amount, description, tags } = body;
+    const { name, client, matter, time_amount, description, tags, client_id } = body;
 
     // Validate required fields
     if (!name || !name.trim()) {
@@ -145,6 +145,7 @@ export async function POST(request: Request) {
         user_id: user.id,
         name: name.trim(),
         client: client?.trim() || null,
+        client_id: client_id || null,
         matter: matter?.trim() || null,
         time_amount: time_amount || null,
         description: description?.trim() || null,

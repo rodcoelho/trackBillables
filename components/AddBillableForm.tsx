@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import TemplateSelector from '@/components/TemplateSelector';
+import ClientSelector from '@/components/ClientSelector';
 import { PRICING } from '@/lib/pricing';
 import type { Subscription, TemplateWithTags } from '@/types/database.types';
 
@@ -11,6 +12,7 @@ interface AddBillableFormProps {
   prefilledHours?: number;
   prefilledDescription?: string;
   prefilledClient?: string;
+  prefilledClientId?: string | null;
   prefilledMatter?: string;
   onEmailEstimateClick?: () => void;
   onDocumentEstimateClick?: () => void;
@@ -19,7 +21,7 @@ interface AddBillableFormProps {
   onTemplateApply?: (template: TemplateWithTags) => void;
 }
 
-export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDescription, prefilledClient, prefilledMatter, onEmailEstimateClick, onDocumentEstimateClick, showAiEstimate, isPro, onTemplateApply }: AddBillableFormProps) {
+export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDescription, prefilledClient, prefilledClientId, prefilledMatter, onEmailEstimateClick, onDocumentEstimateClick, showAiEstimate, isPro, onTemplateApply }: AddBillableFormProps) {
   const [date, setDate] = useState(() => {
     const today = new Date();
     const year = today.getFullYear();
@@ -28,6 +30,7 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
     return `${year}-${month}-${day}`;
   });
   const [client, setClient] = useState('');
+  const [clientId, setClientId] = useState<string | null>(null);
   const [caseNumber, setCaseNumber] = useState('');
   const [matter, setMatter] = useState('');
   const [timeAmount, setTimeAmount] = useState('');
@@ -55,7 +58,10 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
     if (prefilledClient !== undefined) {
       setClient(prefilledClient);
     }
-  }, [prefilledClient]);
+    if (prefilledClientId !== undefined) {
+      setClientId(prefilledClientId ?? null);
+    }
+  }, [prefilledClient, prefilledClientId]);
 
   useEffect(() => {
     if (prefilledMatter !== undefined) {
@@ -127,6 +133,7 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
         body: JSON.stringify({
           date,
           client,
+          client_id: clientId,
           matter,
           time_amount: parseFloat(timeAmount),
           description: description || null,
@@ -148,6 +155,7 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
 
       // Reset form
       setClient('');
+      setClientId(null);
       setCaseNumber('');
       setMatter('');
       setTimeAmount('');
@@ -213,19 +221,15 @@ export default function AddBillableForm({ onSuccess, prefilledHours, prefilledDe
           <div className="flex gap-4">
             <div style={{ width: '25%' }}>
               <label
-                htmlFor="client"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
               >
                 Client <span className="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                id="client"
+              <ClientSelector
                 value={client}
-                onChange={(e) => setClient(e.target.value)}
+                clientId={clientId}
+                onChange={(name, id) => { setClient(name); setClientId(id); }}
                 required
-                placeholder="e.g., Smith"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
               />
             </div>
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import ClientSelector from '@/components/ClientSelector';
 import type { Subscription } from '@/types/database.types';
 
 interface ExportDrawerProps {
@@ -13,6 +14,7 @@ export default function ExportDrawer({ isOpen, onClose }: ExportDrawerProps) {
   const [endDate, setEndDate] = useState('');
   const [format, setFormat] = useState<'csv' | 'xlsx'>('csv');
   const [clientFilter, setClientFilter] = useState('');
+  const [clientFilterId, setClientFilterId] = useState<string | null>(null);
   const [matterFilter, setMatterFilter] = useState('');
   const [customFilename, setCustomFilename] = useState('');
   const [isExporting, setIsExporting] = useState(false);
@@ -163,6 +165,7 @@ export default function ExportDrawer({ isOpen, onClose }: ExportDrawerProps) {
           endDate,
           format,
           clientFilter: clientFilter.trim() || undefined,
+          clientFilterId: clientFilterId || undefined,
           matterFilter: matterFilter.trim() || undefined,
           customFilename: customFilename.trim() || undefined,
         }),
@@ -309,12 +312,12 @@ export default function ExportDrawer({ isOpen, onClose }: ExportDrawerProps) {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Filter by Client (optional)
               </label>
-              <input
-                type="text"
+              <ClientSelector
                 value={clientFilter}
-                onChange={(e) => setClientFilter(e.target.value)}
+                clientId={clientFilterId}
+                onChange={(name, id) => { setClientFilter(name); setClientFilterId(id); }}
+                required={false}
                 placeholder="e.g., Citadel"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
               />
             </div>
 

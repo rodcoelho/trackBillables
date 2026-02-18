@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import ClientSelector from '@/components/ClientSelector';
 import { Billable } from '@/types/database.types';
 
 interface BillableItemProps {
@@ -15,6 +16,7 @@ export default function BillableItem({ billable, onDelete, onDuplicate }: Billab
   const [isEditing, setIsEditing] = useState(false);
   const [date, setDate] = useState(billable.date);
   const [client, setClient] = useState(billable.client);
+  const [clientId, setClientId] = useState<string | null>(billable.client_id);
   const [caseNumber, setCaseNumber] = useState(billable.case_number || '');
   const [matter, setMatter] = useState(billable.matter);
   const [timeAmount, setTimeAmount] = useState(billable.time_amount.toString());
@@ -40,6 +42,7 @@ export default function BillableItem({ billable, onDelete, onDuplicate }: Billab
         .update({
           date,
           client,
+          client_id: clientId,
           case_number: caseNumber || null,
           matter,
           time_amount: parseFloat(timeAmount),
@@ -61,6 +64,7 @@ export default function BillableItem({ billable, onDelete, onDuplicate }: Billab
   const handleCancel = () => {
     setDate(billable.date);
     setClient(billable.client);
+    setClientId(billable.client_id);
     setCaseNumber(billable.case_number || '');
     setMatter(billable.matter);
     setTimeAmount(billable.time_amount.toString());
@@ -93,11 +97,10 @@ export default function BillableItem({ billable, onDelete, onDuplicate }: Billab
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
               Client
             </label>
-            <input
-              type="text"
+            <ClientSelector
               value={client}
-              onChange={(e) => setClient(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
+              clientId={clientId}
+              onChange={(name, id) => { setClient(name); setClientId(id); }}
             />
           </div>
           <div>

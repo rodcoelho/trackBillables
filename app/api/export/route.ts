@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
       endDate,
       format,
       clientFilter,
+      clientFilterId,
       matterFilter,
       customFilename,
     } = body;
@@ -126,7 +127,9 @@ export async function POST(request: NextRequest) {
       .gte('date', startDate)
       .lte('date', endDate);
 
-    if (clientFilter) {
+    if (clientFilterId) {
+      countQuery = countQuery.eq('client_id', clientFilterId);
+    } else if (clientFilter) {
       countQuery = countQuery.eq('client', clientFilter);
     }
 
@@ -168,7 +171,9 @@ export async function POST(request: NextRequest) {
         .order('date', { ascending: true })
         .range(from, from + BATCH_SIZE - 1);
 
-      if (clientFilter) {
+      if (clientFilterId) {
+        batchQuery = batchQuery.eq('client_id', clientFilterId);
+      } else if (clientFilter) {
         batchQuery = batchQuery.eq('client', clientFilter);
       }
 

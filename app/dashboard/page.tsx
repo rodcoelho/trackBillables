@@ -26,6 +26,7 @@ export default function DashboardPage() {
   const [prefilledHours, setPrefilledHours] = useState<number | undefined>(undefined);
   const [prefilledDescription, setPrefilledDescription] = useState<string | undefined>(undefined);
   const [prefilledClient, setPrefilledClient] = useState<string | undefined>(undefined);
+  const [prefilledClientId, setPrefilledClientId] = useState<string | null | undefined>(undefined);
   const [prefilledMatter, setPrefilledMatter] = useState<string | undefined>(undefined);
   const router = useRouter();
   const supabase = createClient();
@@ -66,6 +67,7 @@ export default function DashboardPage() {
     setPrefilledHours(undefined);
     setPrefilledDescription(undefined);
     setPrefilledClient(undefined);
+    setPrefilledClientId(undefined);
     setPrefilledMatter(undefined);
   };
 
@@ -77,6 +79,7 @@ export default function DashboardPage() {
 
   const handleTemplateApply = (template: TemplateWithTags) => {
     if (template.client) setPrefilledClient(template.client);
+    if (template.client_id) setPrefilledClientId(template.client_id);
     if (template.matter) setPrefilledMatter(template.matter);
     if (template.time_amount) setPrefilledHours(template.time_amount);
     if (template.description) setPrefilledDescription(template.description);
@@ -162,6 +165,7 @@ export default function DashboardPage() {
             prefilledHours={prefilledHours}
             prefilledDescription={prefilledDescription}
             prefilledClient={prefilledClient}
+            prefilledClientId={prefilledClientId}
             prefilledMatter={prefilledMatter}
             onEmailEstimateClick={() => setIsEmailEstimateOpen(true)}
             onDocumentEstimateClick={() => setIsDocumentEstimateOpen(true)}

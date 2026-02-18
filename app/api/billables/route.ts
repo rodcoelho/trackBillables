@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { date, client, matter, time_amount, description, case_number } = body;
+    const { date, client, matter, time_amount, description, case_number, client_id } = body;
 
     // Validate required fields
     if (!date || !client || !matter || time_amount === undefined) {
@@ -100,6 +100,7 @@ export async function POST(request: Request) {
         user_id: user.id,
         date,
         client,
+        client_id: client_id || null,
         matter,
         time_amount: parseFloat(time_amount),
         description: description || null,

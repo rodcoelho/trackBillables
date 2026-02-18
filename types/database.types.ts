@@ -7,6 +7,7 @@ export interface Database {
           user_id: string;
           date: string;
           client: string;
+          client_id: string | null;
           matter: string;
           time_amount: number;
           description: string | null;
@@ -19,6 +20,7 @@ export interface Database {
           user_id: string;
           date: string;
           client: string;
+          client_id?: string | null;
           matter: string;
           time_amount: number;
           description?: string | null;
@@ -31,6 +33,7 @@ export interface Database {
           user_id?: string;
           date?: string;
           client?: string;
+          client_id?: string | null;
           matter?: string;
           time_amount?: number;
           description?: string | null;
@@ -45,6 +48,7 @@ export interface Database {
           user_id: string;
           name: string;
           client: string | null;
+          client_id: string | null;
           matter: string | null;
           time_amount: number | null;
           description: string | null;
@@ -56,6 +60,7 @@ export interface Database {
           user_id: string;
           name: string;
           client?: string | null;
+          client_id?: string | null;
           matter?: string | null;
           time_amount?: number | null;
           description?: string | null;
@@ -67,11 +72,32 @@ export interface Database {
           user_id?: string;
           name?: string;
           client?: string | null;
+          client_id?: string | null;
           matter?: string | null;
           time_amount?: number | null;
           description?: string | null;
           created_at?: string;
           updated_at?: string;
+        };
+      };
+      clients: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          created_at?: string;
         };
       };
       template_tags: {
@@ -196,6 +222,8 @@ export type TemplateInsert = Database['public']['Tables']['templates']['Insert']
 export type TemplateUpdate = Database['public']['Tables']['templates']['Update'];
 export type TemplateTag = Database['public']['Tables']['template_tags']['Row'];
 export type TemplateTagInsert = Database['public']['Tables']['template_tags']['Insert'];
+
+export type Client = Database['public']['Tables']['clients']['Row'];
 
 export type TemplateWithTags = Template & {
   tags: TemplateTag[];

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import ClientSelector from '@/components/ClientSelector';
 import type { TemplateWithTags, TemplateTag } from '@/types/database.types';
 
 interface CreateTemplateModalProps {
@@ -9,6 +10,7 @@ interface CreateTemplateModalProps {
   onSave: (data: {
     name: string;
     client: string;
+    client_id: string | null;
     matter: string;
     time_amount: string;
     description: string;
@@ -21,6 +23,7 @@ interface CreateTemplateModalProps {
 export default function CreateTemplateModal({ isOpen, onClose, onSave, editTemplate, existingTags }: CreateTemplateModalProps) {
   const [name, setName] = useState('');
   const [client, setClient] = useState('');
+  const [clientId, setClientId] = useState<string | null>(null);
   const [matter, setMatter] = useState('');
   const [timeAmount, setTimeAmount] = useState('');
   const [description, setDescription] = useState('');
@@ -36,6 +39,7 @@ export default function CreateTemplateModal({ isOpen, onClose, onSave, editTempl
     if (editTemplate) {
       setName(editTemplate.name);
       setClient(editTemplate.client || '');
+      setClientId(editTemplate.client_id || null);
       setMatter(editTemplate.matter || '');
       setTimeAmount(editTemplate.time_amount?.toString() || '');
       setDescription(editTemplate.description || '');
@@ -43,6 +47,7 @@ export default function CreateTemplateModal({ isOpen, onClose, onSave, editTempl
     } else {
       setName('');
       setClient('');
+      setClientId(null);
       setMatter('');
       setTimeAmount('');
       setDescription('');
@@ -66,6 +71,7 @@ export default function CreateTemplateModal({ isOpen, onClose, onSave, editTempl
       await onSave({
         name: name.trim(),
         client: client.trim(),
+        client_id: clientId,
         matter: matter.trim(),
         time_amount: timeAmount,
         description: description.trim(),
@@ -158,12 +164,11 @@ export default function CreateTemplateModal({ isOpen, onClose, onSave, editTempl
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Client
                 </label>
-                <input
-                  type="text"
+                <ClientSelector
                   value={client}
-                  onChange={(e) => setClient(e.target.value)}
-                  placeholder="e.g., Smith"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 dark:bg-gray-700 dark:text-white"
+                  clientId={clientId}
+                  onChange={(name, id) => { setClient(name); setClientId(id); }}
+                  required={false}
                 />
               </div>
               <div className="flex-1">

@@ -69,6 +69,7 @@ export default function TemplatesDrawer({ isOpen, onClose, onApply, subscription
   const handleSaveTemplate = async (data: {
     name: string;
     client: string;
+    client_id: string | null;
     matter: string;
     time_amount: string;
     description: string;
@@ -81,6 +82,7 @@ export default function TemplatesDrawer({ isOpen, onClose, onApply, subscription
         .update({
           name: data.name,
           client: data.client || null,
+          client_id: data.client_id || null,
           matter: data.matter || null,
           time_amount: data.time_amount ? parseFloat(data.time_amount) : null,
           description: data.description || null,
@@ -130,6 +132,7 @@ export default function TemplatesDrawer({ isOpen, onClose, onApply, subscription
         body: JSON.stringify({
           name: data.name,
           client: data.client || null,
+          client_id: data.client_id || null,
           matter: data.matter || null,
           time_amount: data.time_amount ? parseFloat(data.time_amount) : null,
           description: data.description || null,

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import ClientSelector from '@/components/ClientSelector';
 import { PRICING } from '@/lib/pricing';
 import type { Billable, Subscription } from '@/types/database.types';
 
@@ -14,6 +15,7 @@ interface DuplicateEntryModalProps {
 export default function DuplicateEntryModal({ billable, onClose, onSuccess }: DuplicateEntryModalProps) {
   const [date, setDate] = useState(billable.date);
   const [client, setClient] = useState(billable.client);
+  const [clientId, setClientId] = useState<string | null>(billable.client_id);
   const [caseNumber, setCaseNumber] = useState(billable.case_number || '');
   const [matter, setMatter] = useState(billable.matter);
   const [timeAmount, setTimeAmount] = useState(billable.time_amount.toString());
@@ -75,6 +77,7 @@ export default function DuplicateEntryModal({ billable, onClose, onSuccess }: Du
         body: JSON.stringify({
           date,
           client,
+          client_id: clientId,
           matter,
           time_amount: parseFloat(timeAmount),
           description: description || null,
@@ -248,19 +251,15 @@ export default function DuplicateEntryModal({ billable, onClose, onSuccess }: Du
               <div className="flex gap-4">
                 <div style={{ width: '25%' }}>
                   <label
-                    htmlFor="client"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                   >
                     Client <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    id="client"
+                  <ClientSelector
                     value={client}
-                    onChange={(e) => setClient(e.target.value)}
+                    clientId={clientId}
+                    onChange={(name, id) => { setClient(name); setClientId(id); }}
                     required
-                    placeholder="e.g., Smith"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
                   />
                 </div>
 
