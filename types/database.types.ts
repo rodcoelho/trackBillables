@@ -10,6 +10,7 @@ export interface Database {
           matter: string;
           time_amount: number;
           description: string | null;
+          case_number: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -21,6 +22,7 @@ export interface Database {
           matter: string;
           time_amount: number;
           description?: string | null;
+          case_number?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -32,6 +34,7 @@ export interface Database {
           matter?: string;
           time_amount?: number;
           description?: string | null;
+          case_number?: string | null;
           created_at?: string;
           updated_at?: string;
         };

@@ -14,6 +14,7 @@ interface DuplicateEntryModalProps {
 export default function DuplicateEntryModal({ billable, onClose, onSuccess }: DuplicateEntryModalProps) {
   const [date, setDate] = useState(billable.date);
   const [client, setClient] = useState(billable.client);
+  const [caseNumber, setCaseNumber] = useState(billable.case_number || '');
   const [matter, setMatter] = useState(billable.matter);
   const [timeAmount, setTimeAmount] = useState(billable.time_amount.toString());
   const [description, setDescription] = useState(billable.description || '');
@@ -77,6 +78,7 @@ export default function DuplicateEntryModal({ billable, onClose, onSuccess }: Du
           matter,
           time_amount: parseFloat(timeAmount),
           description: description || null,
+          case_number: caseNumber || null,
         }),
       });
 
@@ -258,6 +260,23 @@ export default function DuplicateEntryModal({ billable, onClose, onSuccess }: Du
                     onChange={(e) => setClient(e.target.value)}
                     required
                     placeholder="e.g., Smith"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+
+                <div style={{ width: '15%' }}>
+                  <label
+                    htmlFor="dup-caseNumber"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    Case #
+                  </label>
+                  <input
+                    type="text"
+                    id="dup-caseNumber"
+                    value={caseNumber}
+                    onChange={(e) => setCaseNumber(e.target.value)}
+                    placeholder="e.g., 2024-001"
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
                   />
                 </div>

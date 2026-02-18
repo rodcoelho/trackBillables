@@ -296,10 +296,11 @@ function formatDateAmerican(dateStr: string): string {
 }
 
 function generateCSV(data: any[]): string {
-  const headers = ['Date', 'Client', 'Matter', 'Hours', 'Description'];
+  const headers = ['Date', 'Client', 'Case Number', 'Matter', 'Hours', 'Description'];
   const rows = data.map(row => [
     formatDateAmerican(row.date),
     escapeCsvField(row.client || ''),
+    escapeCsvField(row.case_number || ''),
     escapeCsvField(row.matter || ''),
     row.time_amount,
     escapeCsvField(row.description || ''),
@@ -328,6 +329,7 @@ async function generateExcel(data: any[]): Promise<Buffer> {
   worksheet.columns = [
     { header: 'Date', key: 'date', width: 12 },
     { header: 'Client', key: 'client', width: 20 },
+    { header: 'Case Number', key: 'case_number', width: 15 },
     { header: 'Matter', key: 'matter', width: 30 },
     { header: 'Hours', key: 'hours', width: 10 },
     { header: 'Description', key: 'description', width: 50 },
@@ -346,6 +348,7 @@ async function generateExcel(data: any[]): Promise<Buffer> {
     worksheet.addRow({
       date: formatDateAmerican(row.date),
       client: row.client || '',
+      case_number: row.case_number || '',
       matter: row.matter || '',
       hours: row.time_amount,
       description: row.description || '',

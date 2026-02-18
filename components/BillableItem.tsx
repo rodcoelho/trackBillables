@@ -15,6 +15,7 @@ export default function BillableItem({ billable, onDelete, onDuplicate }: Billab
   const [isEditing, setIsEditing] = useState(false);
   const [date, setDate] = useState(billable.date);
   const [client, setClient] = useState(billable.client);
+  const [caseNumber, setCaseNumber] = useState(billable.case_number || '');
   const [matter, setMatter] = useState(billable.matter);
   const [timeAmount, setTimeAmount] = useState(billable.time_amount.toString());
   const [description, setDescription] = useState(billable.description || '');
@@ -39,6 +40,7 @@ export default function BillableItem({ billable, onDelete, onDuplicate }: Billab
         .update({
           date,
           client,
+          case_number: caseNumber || null,
           matter,
           time_amount: parseFloat(timeAmount),
           description: description || null,
@@ -59,6 +61,7 @@ export default function BillableItem({ billable, onDelete, onDuplicate }: Billab
   const handleCancel = () => {
     setDate(billable.date);
     setClient(billable.client);
+    setCaseNumber(billable.case_number || '');
     setMatter(billable.matter);
     setTimeAmount(billable.time_amount.toString());
     setDescription(billable.description || '');
@@ -94,6 +97,18 @@ export default function BillableItem({ billable, onDelete, onDuplicate }: Billab
               type="text"
               value={client}
               onChange={(e) => setClient(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Case #
+            </label>
+            <input
+              type="text"
+              value={caseNumber}
+              onChange={(e) => setCaseNumber(e.target.value)}
+              placeholder="e.g., 2024-001"
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
             />
           </div>
@@ -162,6 +177,11 @@ export default function BillableItem({ billable, onDelete, onDuplicate }: Billab
             <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">
               {billable.client}
             </span>
+            {billable.case_number && (
+              <span className="text-sm text-gray-500 dark:text-gray-400 font-mono">
+                #{billable.case_number}
+              </span>
+            )}
             <span className="text-sm text-gray-600 dark:text-gray-400">
               {billable.matter}
             </span>

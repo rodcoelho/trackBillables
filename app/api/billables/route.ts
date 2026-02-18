@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { date, client, matter, time_amount, description } = body;
+    const { date, client, matter, time_amount, description, case_number } = body;
 
     // Validate required fields
     if (!date || !client || !matter || time_amount === undefined) {
@@ -103,6 +103,7 @@ export async function POST(request: Request) {
         matter,
         time_amount: parseFloat(time_amount),
         description: description || null,
+        case_number: case_number || null,
       })
       .select()
       .single();
