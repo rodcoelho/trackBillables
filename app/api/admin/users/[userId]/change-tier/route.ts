@@ -30,11 +30,7 @@ export async function POST(
     }
 
     // Verify user exists
-    const { data: user, error: userError } = await adminClient
-      .from('auth.users')
-      .select('email')
-      .eq('id', userId)
-      .single() as { data: { email: string } | null, error: any };
+    const { data: { user }, error: userError } = await adminClient.auth.admin.getUserById(userId);
 
     if (userError || !user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
