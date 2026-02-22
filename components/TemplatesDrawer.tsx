@@ -212,8 +212,8 @@ export default function TemplatesDrawer({ isOpen, onClose, onApply, subscription
   const handleUpgrade = async (interval: 'month' | 'year') => {
     try {
       const priceId = interval === 'month'
-        ? process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_MONTHLY || 'price_1SefDaCnzNMpemDjuleE3Rjy'
-        : process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_ANNUAL || 'price_1SefDaCnzNMpemDjIl8Hku8y';
+        ? process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_MONTHLY!
+        : process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_ANNUAL!;
 
       const response = await fetch('/api/stripe/checkout', {
         method: 'POST',

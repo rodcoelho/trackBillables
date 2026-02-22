@@ -26,8 +26,6 @@ app/api/admin/
 │       │   └── route.ts      # POST - Change subscription tier
 │       ├── change-status/
 │       │   └── route.ts      # POST - Change subscription status
-│       └── extend-trial/
-│           └── route.ts      # POST - Extend trial period
 └── audit-log/
     └── route.ts              # GET - View audit logs
 
@@ -68,7 +66,7 @@ if (!auth.authorized || !auth.user) {
 **Response:**
 - Total users (all time, new 7d, new 30d, growth rate)
 - Revenue metrics (MRR, ARR, monthly revenue)
-- Subscription breakdown (free, pro, trial counts & percentages)
+- Subscription breakdown (free, pro counts & percentages)
 - Activity metrics (billables, avg per user, top users)
 - User growth chart (last 6 months)
 - Daily active users (last 30 days)
@@ -86,8 +84,8 @@ if (!auth.authorized || !auth.user) {
 - `page` (default: 1)
 - `limit` (default: 25, max: 100)
 - `search` (email search)
-- `tier` (all/free/pro/trial)
-- `status` (all/active/canceled/trialing/etc)
+- `tier` (all/free/pro)
+- `status` (all/active/canceled/past_due)
 - `sort` (email/created_at/last_sign_in_at)
 - `order` (asc/desc)
 
@@ -211,7 +209,6 @@ if (!auth.authorized || !auth.user) {
 
 **Valid Statuses:**
 - `active`
-- `trialing`
 - `past_due`
 - `canceled`
 - `incomplete`
@@ -234,40 +231,7 @@ if (!auth.authorized || !auth.user) {
 
 ---
 
-### 7. Extend Trial
-**POST** `/api/admin/users/[userId]/extend-trial`
-
-**Purpose:** Extend trial end date for a user
-
-**Request Body:**
-```json
-{
-  "trial_end": "2025-12-28T23:59:59Z", // required: ISO 8601 timestamp
-  "notes": "User requested extension - evaluating for team" // optional
-}
-```
-
-**Validation:**
-- User status must be `trialing`
-- `trial_end` must be in the future
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Trial extended to 2025-12-28",
-  "subscription": {
-    "trial_end": "2025-12-28T23:59:59Z",
-    "updated_at": "2025-12-14T16:00:00Z"
-  }
-}
-```
-
-**Audit:** Logs `extend_trial` action with old/new trial_end
-
----
-
-### 8. Audit Log
+### 7. Audit Log
 **GET** `/api/admin/audit-log`
 
 **Purpose:** View all admin actions with filters and pagination
@@ -352,7 +316,6 @@ Creates an audit log entry for an admin action.
 - `reset_usage`
 - `change_tier`
 - `change_status`
-- `extend_trial`
 - `view_user`
 - `view_dashboard`
 - `export_data`
@@ -472,7 +435,6 @@ curl http://localhost:3000/api/admin/audit-log?target_user_id=USER_UUID
 - ✅ Reset usage counters
 - ✅ Change tier
 - ✅ Change status
-- ✅ Extend trial
 - ✅ Audit log viewer
 
 ---

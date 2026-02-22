@@ -381,8 +381,8 @@ function UpgradeModal({ onClose, message }: { onClose: () => void; message: stri
   const handleUpgrade = async (interval: 'month' | 'year') => {
     try {
       const priceId = interval === 'month'
-        ? process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_MONTHLY || 'price_1SefDaCnzNMpemDjuleE3Rjy'
-        : process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_ANNUAL || 'price_1SefDaCnzNMpemDjIl8Hku8y';
+        ? process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_MONTHLY!
+        : process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_ANNUAL!;
 
       const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
@@ -424,10 +424,7 @@ function UpgradeModal({ onClose, message }: { onClose: () => void; message: stri
               <div className="flex justify-between items-center mb-2">
                 <div className="text-left">
                   <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                    $5<span className="text-sm font-normal">/month</span>
-                  </div>
-                  <div className="text-xs text-indigo-600 dark:text-indigo-400">
-                    ✨ 14-day free trial
+                    $15<span className="text-sm font-normal">/month</span>
                   </div>
                 </div>
                 <button
@@ -448,10 +445,10 @@ function UpgradeModal({ onClose, message }: { onClose: () => void; message: stri
               <div className="flex justify-between items-center mb-2">
                 <div className="text-left">
                   <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    $50<span className="text-sm font-normal">/year</span>
+                    $144<span className="text-sm font-normal">/year</span>
                   </div>
                   <div className="text-xs text-green-600 dark:text-green-400">
-                    Save $10 • 14-day free trial
+                    SAVE 20%
                   </div>
                 </div>
                 <button

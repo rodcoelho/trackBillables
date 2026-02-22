@@ -88,7 +88,6 @@ export type AuditAction =
   | 'reset_usage'
   | 'change_tier'
   | 'change_status'
-  | 'extend_trial'
   | 'view_user'
   | 'view_dashboard'
   | 'export_data';

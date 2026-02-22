@@ -24,7 +24,6 @@ export async function POST(
     // Validate status
     const validStatuses = [
       'active',
-      'trialing',
       'past_due',
       'canceled',
       'incomplete',

@@ -25,8 +25,7 @@
 
 ### Business Model
 - **Free Tier**: 50 entries/month, 1 export/month
-- **Pro Tier**: Unlimited entries, unlimited exports
-- **Trial Period**: 14 days for Pro subscriptions
+- **Pro Tier**: Unlimited entries, unlimited exports (no trial — paid immediately)
 
 ---
 
@@ -141,7 +140,6 @@ Built-in Supabase authentication table.
 - **Monthly Export Limit**: Unlimited
 - **Features**: Unlimited billable tracking, unlimited exports
 - **Price**: Set in Stripe (configured via Stripe Dashboard)
-- **Trial Period**: 14 days
 
 ### Usage Reset Logic
 - Usage counters (`entries_count_current_month`, `exports_count_current_month`) reset on the 1st of each month
@@ -153,7 +151,7 @@ Built-in Supabase authentication table.
 ### Limit Enforcement
 - **Entry Limits**: Enforced in frontend (`AddBillableForm`) and recommended for backend
 - **Export Limits**: Enforced in backend (`/api/export`)
-- Pro users bypass all limits when status is `active` or `trialing`
+- Pro users bypass all limits when status is `active`
 
 ---
 
@@ -217,7 +215,7 @@ All authentication is handled by Supabase Auth. No custom endpoints needed.
 1. Verifies user authentication
 2. Fetches user's subscription
 3. Creates Stripe customer if doesn't exist
-4. Creates Checkout session with 14-day trial
+4. Creates Checkout session
 5. Redirects to dashboard on success/cancel
 
 **Errors**:
@@ -263,16 +261,14 @@ All authentication is handled by Supabase Auth. No custom endpoints needed.
 - `customer.subscription.created`: Updates subscription record
 - `customer.subscription.updated`: Updates subscription tier, status, billing info
 - `customer.subscription.deleted`: Downgrades to free tier
-- `customer.subscription.trial_will_end`: Logs (TODO: send email)
 - `invoice.payment_succeeded`: Logs
-- `invoice.payment_failed`: Logs (TODO: send email)
+- `invoice.payment_failed`: Sends payment failed email via Resend
 
 **Subscription Update Logic** (`handleSubscriptionUpdated`):
-- Sets `tier` to 'pro' if status is 'active' or 'trialing', else 'free'
+- Sets `tier` to 'pro' if status is 'active', else 'free'
 - Updates `status`, `stripe_subscription_id`, `stripe_customer_id`, `stripe_price_id`
 - Updates `billing_interval`, `current_period_start`, `current_period_end`
 - Updates `cancel_at_period_end`
-- Sets `trial_start` and `trial_end` if applicable
 
 **Errors**:
 - `400 Bad Request`: Invalid signature
@@ -408,14 +404,8 @@ All authentication is handled by Supabase Auth. No custom endpoints needed.
   - `customer.subscription.created`
   - `customer.subscription.updated`
   - `customer.subscription.deleted`
-  - `customer.subscription.trial_will_end`
   - `invoice.payment_succeeded`
   - `invoice.payment_failed`
-
-### Trial Logic
-- 14-day trial configured in checkout session
-- Trial status handled via `subscription.status = 'trialing'`
-- Pro features enabled during trial
 
 ---
 
@@ -525,7 +515,6 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000  # or production URL
 
 ### Subscription Status Logic
 - **Active**: Full access to tier features
-- **Trialing**: Full Pro access during trial
 - **Past Due**: Should limit access (not fully implemented)
 - **Canceled**: Downgrades to free tier
 - **Incomplete/Unpaid**: Should block Pro features
@@ -536,7 +525,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000  # or production URL
 - Usage limits apply immediately
 
 ### Tier Upgrade
-- When checkout completes and subscription becomes active/trialing
+- When checkout completes and subscription becomes active
 - Sets `tier = 'pro'`
 - Removes all limits
 
@@ -570,7 +559,6 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000  # or production URL
 - **Subscription Breakdown**
   - Free users: count + percentage
   - Pro users: count + percentage
-  - Trial users: count + percentage
   - Canceled: count this month
 
 - **User Activity**
@@ -600,7 +588,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000  # or production URL
 **Table Columns**:
 - Email
 - Created Date
-- Subscription Tier (badge: Free/Pro/Trial)
+- Subscription Tier (badge: Free/Pro)
 - Status (badge: active/canceled/past_due/etc)
 - Billables Count (current month / all time)
 - Exports Used (current month)
@@ -608,8 +596,8 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000  # or production URL
 - Actions (View Details button)
 
 **Filters**:
-- Tier: All, Free, Pro, Trial
-- Status: All, Active, Canceled, Past Due, Trialing
+- Tier: All, Free, Pro
+- Status: All, Active, Canceled, Past Due
 - Date Range: Custom range for created_at
 - Search: By email (fuzzy search)
 
@@ -636,7 +624,6 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000  # or production URL
    - Stripe Subscription ID (link to Stripe dashboard)
    - Billing Interval (monthly/yearly)
    - Current Period: Start - End dates
-   - Trial Info: Start/End dates (if applicable)
    - Cancel at Period End: Yes/No
    - Last Updated: Timestamp
 
@@ -656,7 +643,6 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000  # or production URL
 
 5. **Support Actions** (Admin Controls)
    - **Reset Usage Counters**: Button to reset entries_count and exports_count to 0
-   - **Extend Trial**: Input field for new trial_end date (only if status = trialing)
    - **Change Tier**: Dropdown (Free/Pro) + Confirm button
      - Warning: "This will override Stripe subscription. Use carefully."
    - **Change Status**: Dropdown (all valid statuses) + Confirm button
@@ -689,14 +675,9 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000  # or production URL
 2. **Grant Temporary Pro Access**
    - Changes tier to 'pro' for specified duration
    - Sets an "override_until" date (requires new DB field)
-   - Use case: Compensate for downtime, extended trial for enterprise lead
+   - Use case: Compensate for downtime, special arrangement for enterprise lead
 
-3. **Extend Trial Period**
-   - Updates trial_end date to new value
-   - Only available if status = 'trialing'
-   - Use case: User needs more time to evaluate
-
-4. **Force Tier Change**
+3. **Force Tier Change**
    - Manually set tier to free or pro
    - Does NOT modify Stripe subscription (admin must handle separately)
    - Warning displayed: "This does not cancel/create Stripe subscription"
@@ -769,7 +750,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TABLE admin_audit_log (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   admin_user_id UUID NOT NULL REFERENCES auth.users(id),
-  action TEXT NOT NULL, -- e.g., 'reset_usage', 'change_tier', 'extend_trial'
+  action TEXT NOT NULL, -- e.g., 'reset_usage', 'change_tier', 'change_status'
   target_user_id UUID REFERENCES auth.users(id),
   details JSONB, -- Store old/new values, changes made
   notes TEXT, -- Optional admin notes/reason
@@ -895,7 +876,6 @@ All admin routes must:
   "subscriptions": {
     "free": { "count": 950, "percentage": 76 },
     "pro": { "count": 280, "percentage": 22 },
-    "trial": { "count": 20, "percentage": 2 },
     "canceledThisMonth": 15
   },
   "activity": {
@@ -933,7 +913,7 @@ All admin routes must:
 - `limit` (default: 25, max: 100)
 - `search` (email search)
 - `tier` (free/pro/all)
-- `status` (active/canceled/trialing/etc/all)
+- `status` (active/canceled/past_due/all)
 - `sort` (email/created_at/last_active)
 - `order` (asc/desc)
 
@@ -1113,40 +1093,7 @@ All admin routes must:
 
 ---
 
-#### 7. `POST /api/admin/users/[userId]/extend-trial`
-**Purpose**: Extend trial period
-
-**Request Body**:
-```json
-{
-  "trial_end": "2025-12-28T23:59:59Z", // required: ISO 8601 timestamp
-  "notes": "User requested extension - evaluating for team" // optional
-}
-```
-
-**Response**:
-```json
-{
-  "success": true,
-  "message": "Trial extended to 2025-12-28",
-  "subscription": {
-    "trial_end": "2025-12-28T23:59:59Z",
-    "updated_at": "2025-12-14T16:00:00Z"
-  }
-}
-```
-
-**Validation**:
-- Requires status = 'trialing'
-- trial_end must be in future
-
-**Side Effects**:
-- Updates subscription.trial_end
-- Creates audit log entry (includes optional notes if provided)
-
----
-
-#### 8. `GET /api/admin/audit-log`
+#### 7. `GET /api/admin/audit-log`
 **Purpose**: View recent admin actions
 
 **Query Parameters**:
@@ -1260,8 +1207,7 @@ All admin routes must:
 
 ### Phase 2: Full Support Tools
 1. Change tier/status actions
-2. Extend trial action
-3. Audit log viewer
+2. Audit log viewer
 4. Stripe sync status banner
 5. Improved filtering and pagination
 
@@ -1319,7 +1265,7 @@ This finalized specification provides a complete blueprint for building a secure
 **Core Components**:
 1. **Analytics Dashboard** - Complete business metrics at a glance
 2. **User Management** - Search, filter, view detailed user info
-3. **Support Actions** - Reset usage, change tier/status, extend trials
+3. **Support Actions** - Reset usage, change tier/status
 4. **Audit Logging** - Full transparency of all admin actions
 
 **Database Requirements**:
@@ -1360,7 +1306,6 @@ This specification is now ready for implementation. All design decisions have be
 ### TODOs Identified in Code
 1. **Email Notifications** (`app/api/stripe/webhook/route.ts:158, 168`)
    - Send welcome email for new users
-   - Send trial ending reminder
    - Send payment failed notice
 
 2. **Subscription Management UI** (Not yet implemented)

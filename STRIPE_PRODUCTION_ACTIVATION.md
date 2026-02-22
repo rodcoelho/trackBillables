@@ -20,8 +20,7 @@ Before submitting to Stripe, ensure you have:
 
 - [x] **Website live in production**: https://trackbillables.com ✅
 - [x] **Customer service contact page**: https://trackbillables.com/contact ✅
-- [x] **Refund policy**: https://trackbillables.com/refund-policy ✅
-- [x] **Cancellation policy**: https://trackbillables.com/cancellation-policy ✅
+- [x] **Cancellation policy**: https://trackbillables.com/cancellation-policy ✅ (no refunds — access continues until end of billing period)
 - [x] **Business entity** (LLC, Corporation, or Sole Proprietorship)
 - [ ] **Bank account** for receiving payments
 - [ ] **Business tax ID** (EIN for US businesses)
@@ -502,7 +501,7 @@ After activating Stripe production mode:
 3. **Customer Support**:
    - Monitor customer service emails
    - Respond to billing questions promptly
-   - Handle refund requests according to policy
+   - Handle billing questions (no refunds per cancellation policy)
    - Document common issues and solutions
 
 4. **Iterate and Improve**:
@@ -544,7 +543,6 @@ NEXT_PUBLIC_STRIPE_PRICE_ID_ANNUAL=price_...
 - **Pricing**: https://trackbillables.com/pricing
 - **Billing**: https://trackbillables.com/billing
 - **Contact**: https://trackbillables.com/contact
-- **Refund Policy**: https://trackbillables.com/refund-policy
 - **Cancellation Policy**: https://trackbillables.com/cancellation-policy
 - **Webhook**: https://trackbillables.com/api/stripe/webhook
 

@@ -1,5 +1,5 @@
 import { getResend, EMAIL_FROM } from './client';
-import { welcomeEmail, trialEndingEmail, paymentFailedEmail } from './templates';
+import { welcomeEmail, paymentFailedEmail } from './templates';
 
 export async function sendWelcomeEmail(to: string, userName?: string): Promise<void> {
   try {
@@ -7,15 +7,6 @@ export async function sendWelcomeEmail(to: string, userName?: string): Promise<v
     await getResend().emails.send({ from: EMAIL_FROM, to, subject, html });
   } catch (error) {
     console.error('Failed to send welcome email:', error);
-  }
-}
-
-export async function sendTrialEndingEmail(to: string, daysLeft: number): Promise<void> {
-  try {
-    const { subject, html } = trialEndingEmail(daysLeft);
-    await getResend().emails.send({ from: EMAIL_FROM, to, subject, html });
-  } catch (error) {
-    console.error('Failed to send trial ending email:', error);
   }
 }
 

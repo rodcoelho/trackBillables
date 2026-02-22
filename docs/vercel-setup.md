@@ -62,6 +62,15 @@ The domain `trackbillables.com` is registered and managed through Vercel.
 - **MX records** — Routes email to ImprovMX for forwarding (added via Vercel's ImprovMX DNS preset)
 - **TXT (SPF)** — Authorizes ImprovMX to handle mail for the domain
 
+#### Resend (outbound email via `notifications.trackbillables.com`)
+
+| Type | Name | Content | Priority | TTL |
+|------|------|---------|----------|-----|
+| TXT | `resend._domainkey.notifications` | DKIM public key (see Resend dashboard) | — | Auto |
+| MX | `send.notifications` | `feedback-smtp.us-east-1.amazonses.com` | 10 | 60 |
+| TXT | `send.notifications` | `v=spf1 include:amazonses.com ~all` | — | Auto |
+| TXT | `_dmarc.notifications` | `v=DMARC1; p=none;` | — | Auto |
+
 To manage DNS: Vercel Dashboard → Domains → `trackbillables.com`
 
 ## Security Headers

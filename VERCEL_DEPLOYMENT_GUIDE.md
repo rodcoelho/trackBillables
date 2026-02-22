@@ -60,8 +60,8 @@ Click **"Environment Variables"** section.
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | `pk_test_...` (from your .env.local) | TEST mode publishable key |
 | `STRIPE_SECRET_KEY` | `sk_test_...` (from your .env.local) | ⚠️ TEST mode secret key |
 | `STRIPE_WEBHOOK_SECRET` | `whsec_...` (from your .env.local) | TEST mode webhook secret |
-| `NEXT_PUBLIC_STRIPE_PRICE_ID_MONTHLY` | `price_1SefDaCnzNMpemDjuleE3Rjy` | Monthly price ID |
-| `NEXT_PUBLIC_STRIPE_PRICE_ID_ANNUAL` | `price_1SefDaCnzNMpemDjIl8Hku8y` | Annual price ID |
+| `NEXT_PUBLIC_STRIPE_PRICE_ID_MONTHLY` | Your live Stripe monthly price ID | Monthly price ID |
+| `NEXT_PUBLIC_STRIPE_PRICE_ID_ANNUAL` | Your live Stripe annual price ID | Annual price ID |
 
 #### Application Variables
 

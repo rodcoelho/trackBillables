@@ -71,23 +71,6 @@ export function welcomeEmail(userName?: string): { subject: string; html: string
   };
 }
 
-export function trialEndingEmail(daysLeft: number): { subject: string; html: string } {
-  const dayWord = daysLeft === 1 ? 'day' : 'days';
-  return {
-    subject: `Your trial ends in ${daysLeft} ${dayWord}`,
-    html: emailWrapper(`
-      <h2 style="margin:0 0 16px;color:#18181b;font-size:20px;">Your trial is ending soon</h2>
-      <p style="margin:0 0 16px;color:#3f3f46;font-size:15px;line-height:1.6;">
-        Your free trial ends in <strong>${daysLeft} ${dayWord}</strong>. To keep using TrackBillables without interruption, make sure you have an active subscription.
-      </p>
-      ${ctaButton('Manage Billing', `${APP_URL}/billing`)}
-      <p style="margin:0;color:#71717a;font-size:14px;">
-        If you have any questions about our plans, just reply to this email.
-      </p>
-    `),
-  };
-}
-
 export function paymentFailedEmail(): { subject: string; html: string } {
   return {
     subject: 'Payment failed — action required',

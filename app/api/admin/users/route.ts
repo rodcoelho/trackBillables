@@ -127,11 +127,7 @@ export async function GET(request: Request) {
 
     // Apply tier filter
     if (tier !== 'all') {
-      if (tier === 'trial') {
-        combinedUsers = combinedUsers.filter((u) => u.subscription.status === 'trialing');
-      } else {
-        combinedUsers = combinedUsers.filter((u) => u.subscription.tier === tier);
-      }
+      combinedUsers = combinedUsers.filter((u) => u.subscription.tier === tier);
     }
 
     // Apply status filter

@@ -4,7 +4,7 @@
 
 TrackBillables uses two separate services for email:
 
-- **Outbound email** (sending): Gmail SMTP, configured in the app's environment variables
+- **Outbound email** (sending): Resend, sending from `notifications.trackbillables.com` subdomain
 - **Inbound email** (receiving): ImprovMX free forwarding, configured via DNS in Vercel
 
 ## Inbound Email — ImprovMX
@@ -34,9 +34,20 @@ These records live in Vercel's DNS settings under the `trackbillables.com` domai
 - 10 MB attachment size
 - No SMTP sending (forwarding only)
 
-## Outbound Email — Gmail SMTP
+## Outbound Email — Resend
 
-Transactional emails (e.g., notifications) are sent from the app using Gmail SMTP, configured via environment variables in the Vercel project settings. This is separate from ImprovMX and handles only outgoing mail.
+Transactional emails (welcome, payment failed) are sent via [Resend](https://resend.com) from `noreply@notifications.trackbillables.com`. Uses the `notifications.trackbillables.com` subdomain to keep sending separate from the root domain's ImprovMX forwarding.
+
+### Configuration
+
+- **API key**: `RESEND_API_KEY` env var (set in Vercel)
+- **FROM address**: `TrackBillables <noreply@notifications.trackbillables.com>` (in `lib/email/client.ts`)
+- **DNS**: DKIM/CNAME records for `notifications.trackbillables.com` added in Vercel DNS
+
+### Emails sent
+
+- Welcome email — on signup
+- Payment failed — on invoice failure (via Stripe `invoice.payment_failed` webhook)
 
 ## Where `support@trackbillables.com` is used
 

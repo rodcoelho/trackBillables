@@ -51,8 +51,7 @@
 ### 5. User Experience
 - ✅ Graceful upgrade prompts (not annoying)
 - ✅ Clear usage indicators
-- ✅ 14-day free trial on both plans
-- ✅ Annual plan saves $10
+- ✅ Annual plan saves 20%
 
 ---
 
@@ -144,7 +143,7 @@ Keep this terminal running while testing!
 - [ ] Complete checkout
 - [ ] Should redirect back to dashboard
 - [ ] Check Stripe CLI terminal - should see webhook events
-- [ ] Check Supabase: `subscriptions` table should show `tier='pro'`, `status='trialing'`
+- [ ] Check Supabase: `subscriptions` table should show `tier='pro'`, `status='active'`
 - [ ] Add entries - should work unlimited
 - [ ] Export multiple times - should work unlimited
 
@@ -292,7 +291,7 @@ Once testing is complete:
    - Switch Stripe keys from test to live mode
 
 2. **Optional Enhancements:**
-   - Add email notifications (trial ending, payment failed)
+   - Add email notifications (payment failed)
    - Add usage alerts (90% of limit reached)
    - Create pricing page (`/pricing`)
    - Add success/cancel pages after Stripe checkout
@@ -378,7 +377,6 @@ stripe trigger customer.subscription.created
 - ✅ Pro users have unlimited access
 - ✅ Stripe Checkout creates Pro subscriptions
 - ✅ Webhooks update subscription status in database
-- ✅ 14-day trial works correctly
 - ✅ Monthly/Annual billing options available
 - ✅ Customer portal accessible for Pro users
 

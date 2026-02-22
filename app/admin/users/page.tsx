@@ -133,7 +133,6 @@ export default function AdminUsersPage() {
               <option value="all">All Tiers</option>
               <option value="free">Free</option>
               <option value="pro">Pro</option>
-              <option value="trial">Trial</option>
             </select>
           </div>
 
@@ -149,7 +148,6 @@ export default function AdminUsersPage() {
             >
               <option value="all">All Statuses</option>
               <option value="active">Active</option>
-              <option value="trialing">Trialing</option>
               <option value="canceled">Canceled</option>
               <option value="past_due">Past Due</option>
             </select>

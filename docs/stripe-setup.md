@@ -24,7 +24,6 @@ These must be set in both `.env.local` (local dev) and Vercel Environment Variab
 | `customer.subscription.created` | Syncs new subscription to Supabase |
 | `customer.subscription.updated` | Syncs plan changes, renewals |
 | `customer.subscription.deleted` | Handles cancellation, downgrades to free |
-| `customer.subscription.trial_will_end` | Sends trial ending email notification |
 | `invoice.payment_succeeded` | Confirms payment, syncs subscription |
 | `invoice.payment_failed` | Sends payment failed email notification |
 
@@ -33,7 +32,7 @@ These must be set in both `.env.local` (local dev) and Vercel Environment Variab
 1. Stripe sends a POST to `/api/stripe/webhook` with the event payload
 2. The webhook handler verifies the signature using `STRIPE_WEBHOOK_SECRET`
 3. Based on event type, it syncs subscription data to the `subscriptions` table in Supabase
-4. Email notifications are sent via Resend for trial endings and payment failures
+4. Email notifications are sent via Resend for payment failures
 
 ## Pricing
 

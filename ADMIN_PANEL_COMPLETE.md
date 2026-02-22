@@ -21,8 +21,7 @@ The complete admin panel for TrackBillables has been successfully implemented. B
 4. ✅ `POST /api/admin/users/[userId]/reset-usage` - Reset usage counters
 5. ✅ `POST /api/admin/users/[userId]/change-tier` - Change subscription tier
 6. ✅ `POST /api/admin/users/[userId]/change-status` - Change subscription status
-7. ✅ `POST /api/admin/users/[userId]/extend-trial` - Extend trial period
-8. ✅ `GET /api/admin/audit-log` - View audit logs (filtered, paginated)
+7. ✅ `GET /api/admin/audit-log` - View audit logs (filtered, paginated)
 
 ### Documentation
 - ✅ Complete API documentation in `/app/api/admin/README.md`
@@ -70,7 +69,6 @@ The complete admin panel for TrackBillables has been successfully implemented. B
      - Reset usage counters
      - Change tier (free/pro)
      - Change status (all valid statuses)
-     - Extend trial (if trialing)
    - All actions with confirmation modals
    - Optional notes for each action
 
@@ -139,8 +137,7 @@ app/api/admin/
 │       ├── route.ts
 │       ├── reset-usage/route.ts
 │       ├── change-tier/route.ts
-│       ├── change-status/route.ts
-│       └── extend-trial/route.ts
+│       └── change-status/route.ts
 └── audit-log/route.ts
 ```
 
@@ -249,7 +246,6 @@ Plus a "Back to App" link to return to the main dashboard.
 - Reset usage counters
 - Change tier (with warning)
 - Change status (with warning)
-- Extend trial (validation)
 - Optional notes for all actions
 - Confirmation modals
 
@@ -270,7 +266,6 @@ Plus a "Back to App" link to return to the main dashboard.
 - New users (7d, 30d)
 - Growth rate
 - Free vs Pro distribution
-- Trial users
 - Active users
 
 ### Revenue Metrics
@@ -304,7 +299,7 @@ Plus a "Back to App" link to return to the main dashboard.
 
 ### Users List
 - [ ] Search for user by email
-- [ ] Filter by tier (Free/Pro/Trial)
+- [ ] Filter by tier (Free/Pro)
 - [ ] Filter by status (Active/Canceled/etc)
 - [ ] Sort by column (email, created, last sign in)
 - [ ] Navigate between pages
@@ -335,12 +330,6 @@ Plus a "Back to App" link to return to the main dashboard.
   - [ ] Add optional notes
   - [ ] Confirm change
   - [ ] Verify success
-- [ ] Click "Extend Trial" (if user is trialing)
-  - [ ] Select new date
-  - [ ] Add optional notes
-  - [ ] Confirm extension
-  - [ ] Verify success
-
 ### Audit Log
 - [ ] Navigate to `/admin/audit-log`
 - [ ] View all audit entries
@@ -380,7 +369,6 @@ Plus a "Back to App" link to return to the main dashboard.
 4. **Email Notifications**
    - Manual email triggers
    - Welcome emails
-   - Trial ending reminders
    - Payment failed notices
 
 5. **Export Reports**

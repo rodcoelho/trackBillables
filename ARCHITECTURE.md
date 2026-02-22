@@ -403,7 +403,6 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
   - Reset usage counters
   - Change subscription tier (free ↔ pro)
   - Change subscription status
-  - Extend trial periods
 - **Audit Logging**: All admin actions logged to `admin_audit_log` table
 
 **Admin API Routes**:
@@ -525,8 +524,7 @@ Log audit entry → Return success
 
 ### Stripe Production Activation
 - [ ] Add customer service contact page
-- [ ] Add refund and dispute policy page
-- [ ] Add cancellation policy page
+- [x] Add cancellation policy page (no refunds — access continues until end of billing period)
 - [ ] Submit website to Stripe for production approval
 - [ ] Create production Stripe products (Pro Monthly $10, Pro Annual $100)
 - [ ] Update environment variables with live Stripe keys

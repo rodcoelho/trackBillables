@@ -70,7 +70,6 @@ export default function AuditLogPage() {
       reset_usage: 'bg-blue-100 text-blue-800',
       change_tier: 'bg-indigo-100 text-indigo-800',
       change_status: 'bg-purple-100 text-purple-800',
-      extend_trial: 'bg-green-100 text-green-800',
     };
     return colors[action] || 'bg-gray-100 text-gray-800';
   };
@@ -103,7 +102,6 @@ export default function AuditLogPage() {
               <option value="reset_usage">Reset Usage</option>
               <option value="change_tier">Change Tier</option>
               <option value="change_status">Change Status</option>
-              <option value="extend_trial">Extend Trial</option>
             </select>
           </div>
 
@@ -262,12 +260,6 @@ export default function AuditLogPage() {
               Change Status
             </span>
             <span className="text-xs text-gray-600">- Update subscription status</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-              Extend Trial
-            </span>
-            <span className="text-xs text-gray-600">- Extend trial period</span>
           </div>
         </div>
       </div>

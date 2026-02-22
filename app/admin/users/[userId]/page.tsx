@@ -64,12 +64,9 @@ export default function UserDetailPage() {
   const [showResetUsageModal, setShowResetUsageModal] = useState(false);
   const [showChangeTierModal, setShowChangeTierModal] = useState(false);
   const [showChangeStatusModal, setShowChangeStatusModal] = useState(false);
-  const [showExtendTrialModal, setShowExtendTrialModal] = useState(false);
-
   // Form states
   const [newTier, setNewTier] = useState('');
   const [newStatus, setNewStatus] = useState('');
-  const [newTrialEnd, setNewTrialEnd] = useState('');
   const [notes, setNotes] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -171,41 +168,6 @@ export default function UserDetailPage() {
     } catch (error) {
       console.error('Error changing status:', error);
       alert('Failed to change status');
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const handleExtendTrial = async () => {
-    if (!newTrialEnd) {
-      alert('Please enter a trial end date');
-      return;
-    }
-
-    setActionLoading(true);
-    try {
-      const response = await fetch(`/api/admin/users/${userId}/extend-trial`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          trial_end: new Date(newTrialEnd).toISOString(),
-          notes: notes || undefined,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to extend trial');
-      }
-
-      alert('Trial extended successfully!');
-      setShowExtendTrialModal(false);
-      setNotes('');
-      setNewTrialEnd('');
-      fetchUserDetail(); // Refresh data
-    } catch (error: any) {
-      console.error('Error extending trial:', error);
-      alert(error.message || 'Failed to extend trial');
     } finally {
       setActionLoading(false);
     }
@@ -371,17 +333,6 @@ export default function UserDetailPage() {
                   </dd>
                 </div>
               )}
-              {data.subscription.trial_start && data.subscription.trial_end && (
-                <>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">Trial Period</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
-                      {new Date(data.subscription.trial_start).toLocaleDateString()} -{' '}
-                      {new Date(data.subscription.trial_end).toLocaleDateString()}
-                    </dd>
-                  </div>
-                </>
-              )}
               <div>
                 <dt className="text-sm font-medium text-gray-500">Cancel at Period End</dt>
                 <dd className="mt-1 text-sm text-gray-900">
@@ -539,15 +490,6 @@ export default function UserDetailPage() {
                 Change Status
               </button>
 
-              {data.subscription.status === 'trialing' && (
-                <button
-                  onClick={() => setShowExtendTrialModal(true)}
-                  className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
-                >
-                  Extend Trial
-                </button>
-              )}
-
               <div className="pt-4 border-t border-gray-200">
                 <p className="text-xs text-gray-500 mb-2">Stripe Dashboard</p>
                 {data.subscription.stripe_customer_id ? (
@@ -666,7 +608,6 @@ export default function UserDetailPage() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="active">Active</option>
-                  <option value="trialing">Trialing</option>
                   <option value="past_due">Past Due</option>
                   <option value="canceled">Canceled</option>
                   <option value="incomplete">Incomplete</option>
@@ -711,55 +652,6 @@ export default function UserDetailPage() {
         </div>
       )}
 
-      {showExtendTrialModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
-          <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setShowExtendTrialModal(false)} />
-          <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Extend Trial</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">New Trial End Date</label>
-                <input
-                  type="date"
-                  value={newTrialEnd}
-                  onChange={(e) => setNewTrialEnd(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Notes (optional)</label>
-                <textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Reason for extension..."
-                />
-              </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => {
-                    setShowExtendTrialModal(false);
-                    setNotes('');
-                    setNewTrialEnd('');
-                  }}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleExtendTrial}
-                  disabled={actionLoading || !newTrialEnd}
-                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
-                >
-                  {actionLoading ? 'Extending...' : 'Extend Trial'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

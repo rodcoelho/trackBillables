@@ -12,4 +12,4 @@ export function getResend(): Resend {
   return _resend;
 }
 
-export const EMAIL_FROM = 'onboarding@resend.dev';
+export const EMAIL_FROM = 'TrackBillables <noreply@notifications.trackbillables.com>';

@@ -52,7 +52,7 @@ Or apply via Supabase dashboard:
 `/app/api/email-estimate/route.ts`
 
 - Verifies user is authenticated
-- Checks if user is Pro (tier='pro', status='active' or 'trialing')
+- Checks if user is Pro (tier='pro', status='active')
 - Calls Claude Haiku API with structured prompt
 - Parses JSON response with `billable_hours` and `description`
 - Saves `attorney_email` to database

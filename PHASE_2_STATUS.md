@@ -49,8 +49,8 @@ All Phase 2 frontend pages and components have been successfully implemented!
    - File: `app/admin/users/page.tsx`
    - Features:
      - Search by email (fuzzy search)
-     - Filter by tier (all/free/pro/trial)
-     - Filter by status (all/active/trialing/canceled/past_due)
+     - Filter by tier (all/free/pro)
+     - Filter by status (all/active/canceled/past_due)
      - Sortable columns (email, created, last sign in)
      - Pagination (25 users per page)
      - User details display (tier, status, entries, billables)
@@ -66,7 +66,6 @@ All Phase 2 frontend pages and components have been successfully implemented!
        - Tier, status (with badges)
        - Stripe customer/subscription links (open in new tab)
        - Billing interval, current period
-       - Trial dates (if applicable)
        - Cancel at period end flag
      - **Usage Stats Section**
        - Entries used (current month)
@@ -81,7 +80,6 @@ All Phase 2 frontend pages and components have been successfully implemented!
        - Reset Usage Counters button
        - Change Tier button
        - Change Status button
-       - Extend Trial button (if status = trialing)
        - Stripe dashboard links
      - **Admin Audit Log Section**
        - Last 10 actions for this user
@@ -91,7 +89,6 @@ All Phase 2 frontend pages and components have been successfully implemented!
        - Reset usage confirmation
        - Change tier form (with warnings)
        - Change status form (with warnings)
-       - Extend trial form (with validation)
        - Optional notes field for all actions
        - Loading states during API calls
        - Success/error messages
