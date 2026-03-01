@@ -100,7 +100,7 @@ Click **"Environment Variables"** section.
 ### 3.2 Deployment Success
 When complete, you'll see:
 - ✅ **"Congratulations!"** message
-- Your deployment URL: `https://trackbillables.vercel.app` (or similar)
+- Your deployment URL: `https://trackbillables.com`
 - A preview screenshot of your site
 
 **Click "Visit"** to see your live site!
@@ -157,7 +157,7 @@ Now that you have your deployment URL, we need to add it to environment variable
 3. Click **"Environment Variables"** in left sidebar
 4. Add new variable:
    - **Name**: `NEXT_PUBLIC_APP_URL`
-   - **Value**: `https://trackbillables.vercel.app` (your actual URL)
+   - **Value**: `https://trackbillables.com`
    - Click **"Save"**
 
 ### 5.2 Redeploy
@@ -168,15 +168,12 @@ Now that you have your deployment URL, we need to add it to environment variable
 
 ---
 
-## Step 6: Configure Stripe Webhook (TEST Mode)
+## Step 6: Configure Stripe Webhook (Live Mode)
 
-Even though we're using test mode, let's configure the webhook with your live URL.
-
-### 6.1 Update Stripe Webhook URL
-1. Go to Stripe Dashboard: https://dashboard.stripe.com/test/webhooks
-2. Find your existing webhook (or create new one if needed)
-3. Click to edit
-4. Update **Endpoint URL** to: `https://trackbillables.vercel.app/api/stripe/webhook`
+### 6.1 Set Up Stripe Webhook URL
+1. Go to Stripe Dashboard (Live mode): https://dashboard.stripe.com/webhooks
+2. Click **"Add endpoint"**
+3. Set **Endpoint URL** to: `https://trackbillables.com/api/stripe/webhook`
 5. Ensure these events are selected:
    - `checkout.session.completed`
    - `customer.subscription.created`
@@ -291,8 +288,7 @@ Once domain is configured:
 
 1. Go to Vercel → **Settings** → **Environment Variables**
 2. Update `NEXT_PUBLIC_APP_URL`:
-   - Change from: `https://trackbillables.vercel.app`
-   - Change to: `https://trackbillables.com`
+   - Set to: `https://trackbillables.com`
 3. Click **"Save"**
 4. Redeploy application
 

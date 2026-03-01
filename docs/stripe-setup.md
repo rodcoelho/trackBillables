@@ -14,7 +14,7 @@ These must be set in both `.env.local` (local dev) and Vercel Environment Variab
 
 ## Webhook Setup
 
-**Endpoint URL:** `https://trackbillables.vercel.app/api/stripe/webhook`
+**Endpoint URL:** `https://trackbillables.com/api/stripe/webhook`
 
 ### Required Events
 

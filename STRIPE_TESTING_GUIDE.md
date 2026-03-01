@@ -191,7 +191,7 @@ curl http://localhost:3000/api/subscription \
 curl -X POST http://localhost:3000/api/stripe/checkout \
   -H "Content-Type: application/json" \
   -H "Cookie: [your-session-cookie]" \
-  -d '{"priceId":"price_1SefDaCnzNMpemDjuleE3Rjy","billingInterval":"month"}'
+  -d '{"priceId":"[your NEXT_PUBLIC_STRIPE_PRICE_ID_MONTHLY value]","billingInterval":"month"}'
 
 # Test customer portal session creation
 curl -X POST http://localhost:3000/api/stripe/portal \
