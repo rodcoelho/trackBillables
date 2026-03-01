@@ -63,20 +63,26 @@ export async function syncSubscriptionToSupabase(
     throw new Error('Could not determine user ID for subscription sync');
   }
 
+  // In Stripe API >= 2025-03-31, current_period_start/end moved from
+  // subscription level to subscription item level
+  const item = stripeSubscription.items.data[0];
+  const periodStart = stripeSubscription.current_period_start ?? item?.current_period_start;
+  const periodEnd = stripeSubscription.current_period_end ?? item?.current_period_end;
+
   const subscriptionData = {
     user_id: targetUserId,
     stripe_customer_id: stripeSubscription.customer as string,
     stripe_subscription_id: stripeSubscription.id,
-    stripe_price_id: stripeSubscription.items.data[0]?.price.id || null,
+    stripe_price_id: item?.price.id || null,
     tier: 'pro' as const,
     status: stripeSubscription.status,
-    billing_interval: stripeSubscription.items.data[0]?.plan.interval || 'month',
-    current_period_start: new Date(
-      stripeSubscription.current_period_start * 1000
-    ).toISOString(),
-    current_period_end: new Date(
-      stripeSubscription.current_period_end * 1000
-    ).toISOString(),
+    billing_interval: item?.plan.interval || 'month',
+    current_period_start: periodStart
+      ? new Date(periodStart * 1000).toISOString()
+      : null,
+    current_period_end: periodEnd
+      ? new Date(periodEnd * 1000).toISOString()
+      : null,
     cancel_at_period_end: stripeSubscription.cancel_at_period_end,
     canceled_at: stripeSubscription.canceled_at
       ? new Date(stripeSubscription.canceled_at * 1000).toISOString()
