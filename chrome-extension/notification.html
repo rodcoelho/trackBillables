@@ -33,12 +33,27 @@
     }
     .hint {
       font-size: 11px;
-      color: #475569;
+      color: #22c55e;
       margin-top: 10px;
+      transition: color 1s linear;
+    }
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 100%;
+      background: #22c55e;
+      transition: width 1s linear, background-color 1s linear;
     }
   </style>
 </head>
 <body>
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
   <div class="container">
     <div class="title">TrackBillables</div>
     <div class="message">Time to track your billable hours!</div>
