@@ -11,7 +11,8 @@ TrackBillables is a full-stack SaaS application for legal professionals to track
 - **Database & Auth**: Supabase (PostgreSQL + Auth)
 - **OAuth Provider**: Google Cloud Platform
 - **Payment Processing**: Stripe
-- **Email**: Google Workspace SMTP (for transactional emails)
+- **Email (Outbound)**: Resend (from `notifications.trackbillables.com`)
+- **Email (Inbound)**: ImprovMX (forwarding `support@trackbillables.com` to Gmail)
 
 ---
 
@@ -42,12 +43,8 @@ STRIPE_WEBHOOK_SECRET=[webhook secret]
 NEXT_PUBLIC_STRIPE_PRICE_ID_MONTHLY=[monthly price ID]
 NEXT_PUBLIC_STRIPE_PRICE_ID_ANNUAL=[annual price ID]
 
-# Email (Gmail SMTP)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=[gmail address]
-SMTP_PASSWORD=[app-specific password]
-SMTP_FROM=[from email address]
+# Email (Resend)
+RESEND_API_KEY=[Resend API key]
 
 # Application
 NEXT_PUBLIC_APP_URL=https://trackbillables.com
@@ -447,12 +444,8 @@ SUPABASE_SERVICE_ROLE_KEY=[service_role key - admin access, NEVER expose]
 STRIPE_SECRET_KEY=[sk_test_... or sk_live_...]
 STRIPE_WEBHOOK_SECRET=[whsec_... from Stripe webhook settings]
 
-# Email
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=[your-email@gmail.com]
-SMTP_PASSWORD=[app-specific password from Google]
-SMTP_FROM=[noreply@trackbillables.com or your-email@gmail.com]
+# Email (Resend)
+RESEND_API_KEY=[Resend API key]
 ```
 
 ---
@@ -564,7 +557,7 @@ Log audit entry → Return success
 - **Subscription Creation**: Test upgrading to Pro in test mode
 - **Webhook Processing**: Monitor webhook success rate in Stripe
 - **Database Connectivity**: Monitor API response times
-- **Email Delivery**: Monitor SMTP delivery success
+- **Email Delivery**: Monitor Resend delivery in dashboard (resend.com)
 
 ### Backup & Recovery
 - **Database**: Supabase provides automatic daily backups (retained for 7 days on free plan)
@@ -635,6 +628,31 @@ Log audit entry → Return success
 - Check entries_count_current_month and exports_count_current_month values
 - Ensure API routes are incrementing counters correctly
 - Verify usage_reset_date is being updated
+
+---
+
+## Chrome Extension
+
+**Purpose**: Reminder timer and stopwatch to prompt users to track billable hours.
+
+**Key Files**:
+- `chrome-extension/manifest.json` — MV3 manifest, permissions: `alarms`, `storage`, `tabs`, `offscreen`
+- `chrome-extension/background.js` — Service worker: alarm handlers, reminder/stopwatch logic, notification popup
+- `chrome-extension/popup.html` / `popup.js` — Extension popup UI (mode tabs, interval selector, alert style, schedule)
+- `chrome-extension/popup.css` — Popup styling
+- `chrome-extension/offscreen.html` / `offscreen.js` — Offscreen document for audio playback (chime sound)
+- `chrome-extension/notification.html` / `notification.js` — Auto-closing popup window notification (8s countdown)
+
+**Features**:
+- **Reminder mode**: Configurable interval (15m, 30m, or custom), alert styles (Sound, Notification, Both)
+- **Stopwatch mode**: Running timer with badge display, badge color flash every 15 minutes
+- **Work hours schedule**: Auto-start/stop reminders during configured hours and timezone
+- **Notification popup**: `chrome.windows.create()` opens a small styled window that auto-closes after 8 seconds with a visible countdown; clicking opens TrackBillables
+
+**Architecture Notes**:
+- Service worker cannot use `setTimeout` reliably (gets terminated); all timed events use `chrome.alarms`
+- Auto-close of notification popup is handled inside `notification.js` (the popup page stays alive)
+- `open-app` message handler reuses existing TrackBillables tab or creates a new one
 
 ---
 

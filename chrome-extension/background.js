@@ -90,6 +90,33 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   }
 });
 
+let notificationWindowId = null;
+
+function showNotification() {
+  // Close any existing notification window first
+  if (notificationWindowId !== null) {
+    chrome.windows.remove(notificationWindowId).catch(() => {});
+    notificationWindowId = null;
+  }
+
+  chrome.windows.create({
+    url: chrome.runtime.getURL('notification.html'),
+    type: 'popup',
+    width: 360,
+    height: 140,
+    focused: true
+  }, (win) => {
+    if (win) notificationWindowId = win.id;
+  });
+}
+
+// Clean up tracking when notification window is closed manually
+chrome.windows.onRemoved.addListener((windowId) => {
+  if (windowId === notificationWindowId) {
+    notificationWindowId = null;
+  }
+});
+
 async function handleReminderFire(state) {
   const notifyType = state.reminder.notifyType || 'sound';
 
@@ -97,17 +124,7 @@ async function handleReminderFire(state) {
     await playChime();
   }
   if (notifyType === 'popup' || notifyType === 'both') {
-    // Reuse an existing TrackBillables tab if one is open
-    chrome.tabs.query({ url: 'https://trackbillables.com/*' }, (tabs) => {
-      if (tabs.length > 0) {
-        chrome.tabs.update(tabs[0].id, { active: true });
-        if (tabs[0].windowId) {
-          chrome.windows.update(tabs[0].windowId, { focused: true });
-        }
-      } else {
-        chrome.tabs.create({ url: 'https://trackbillables.com' });
-      }
-    });
+    showNotification();
   }
 
   // Reschedule for next interval
@@ -233,6 +250,20 @@ async function clearAllAlarms() {
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === 'play-bell') return; // Ignore, for offscreen only
+
+  if (msg.type === 'open-app') {
+    chrome.tabs.query({ url: 'https://trackbillables.com/*' }, (tabs) => {
+      if (tabs.length > 0) {
+        chrome.tabs.update(tabs[0].id, { active: true });
+        if (tabs[0].windowId) {
+          chrome.windows.update(tabs[0].windowId, { focused: true });
+        }
+      } else {
+        chrome.tabs.create({ url: 'https://trackbillables.com' });
+      }
+    });
+    return;
+  }
 
   handleMessage(msg).then(sendResponse);
   return true; // Keep channel open for async response

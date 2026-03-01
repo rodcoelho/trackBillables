@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TrackBillables",
-  "version": "2.0",
+  "version": "2.1",
   "description": "Reminder timer and stopwatch to remind you to track your billable hours. Opens TrackBillables on every new tab.",
   "permissions": ["alarms", "storage", "tabs", "offscreen"],
   "action": {
