@@ -1,7 +1,12 @@
-import { type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 
 export async function middleware(request: NextRequest) {
+  // Skip Supabase session refresh for Outlook API routes (they use JWT auth)
+  if (request.nextUrl.pathname.startsWith('/api/outlook/')) {
+    return NextResponse.next();
+  }
+
   return await updateSession(request);
 }
 

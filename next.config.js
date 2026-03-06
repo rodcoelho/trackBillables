@@ -12,6 +12,17 @@ const securityHeaders = [
   },
 ];
 
+const outlookHeaders = [
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  { key: 'X-XSS-Protection', value: '0' },
+  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+  {
+    key: 'Content-Security-Policy',
+    value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://appsforoffice.microsoft.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://*.supabase.co https://appsforoffice.microsoft.com; frame-ancestors https://*.office.com https://*.office365.com https://*.outlook.com https://*.microsoft.com; object-src 'none'; base-uri 'self';"
+  },
+];
+
 const nextConfig = {
   experimental: {
     serverActions: {
@@ -21,7 +32,11 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: '/outlook/(.*)',
+        headers: outlookHeaders,
+      },
+      {
+        source: '/((?!outlook/).*)',
         headers: securityHeaders,
       },
     ];
