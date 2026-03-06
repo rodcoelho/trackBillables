@@ -87,24 +87,7 @@
           </ExtensionPoint>
         </DesktopFormFactor>
 
-        <MobileFormFactor>
-          <ExtensionPoint xsi:type="MobileMessageReadCommandSurface">
-            <Group id="trackBillablesMobileGroup">
-              <Label resid="groupLabel" />
-              <Control xsi:type="MobileButton" id="trackTimeMobileBtn">
-                <Label resid="btnLabel" />
-                <Icon>
-                  <bt:Image size="25" resid="icon25" />
-                  <bt:Image size="32" resid="icon32" />
-                  <bt:Image size="48" resid="icon48" />
-                </Icon>
-                <Action xsi:type="ShowTaskpane">
-                  <SourceLocation resid="taskpaneUrl" />
-                </Action>
-              </Control>
-            </Group>
-          </ExtensionPoint>
-        </MobileFormFactor>
+
       </Host>
     </Hosts>
 
