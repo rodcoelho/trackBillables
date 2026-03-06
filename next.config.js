@@ -19,7 +19,7 @@ const outlookHeaders = [
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
   {
     key: 'Content-Security-Policy',
-    value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://appsforoffice.microsoft.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://*.supabase.co https://appsforoffice.microsoft.com; frame-ancestors https://*.office.com https://*.office365.com https://*.outlook.com https://*.microsoft.com; object-src 'none'; base-uri 'self';"
+    value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://appsforoffice.microsoft.com https://*.cdn.office.net https://*.officeapps.live.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://*.cdn.office.net; connect-src 'self' https://*.supabase.co https://appsforoffice.microsoft.com https://*.cdn.office.net https://*.officeapps.live.com https://telemetry.firstpartyapps.oaspapps.com; frame-ancestors https://*.office.com https://*.office365.com https://*.outlook.com https://*.microsoft.com https://*.outlook.live.com; object-src 'none'; base-uri 'self';"
   },
 ];
 

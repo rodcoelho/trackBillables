@@ -1,5 +1,3 @@
-import Script from 'next/script';
-
 export const metadata = {
   title: 'TrackBillables - Outlook Add-in',
 };
@@ -11,10 +9,12 @@ export default function OutlookLayout({
 }) {
   return (
     <>
-      <Script
-        src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"
-        strategy="beforeInteractive"
-      />
+      <head>
+        <script
+          src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"
+          type="text/javascript"
+        />
+      </head>
       {children}
     </>
   );
