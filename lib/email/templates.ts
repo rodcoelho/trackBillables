@@ -71,24 +71,6 @@ export function welcomeEmail(userName?: string): { subject: string; html: string
   };
 }
 
-export function verificationCodeEmail(code: string): { subject: string; html: string } {
-  return {
-    subject: 'Your TrackBillables verification code',
-    html: emailWrapper(`
-      <h2 style="margin:0 0 16px;color:#18181b;font-size:20px;">Your verification code</h2>
-      <p style="margin:0 0 16px;color:#3f3f46;font-size:15px;line-height:1.6;">
-        Enter this code in the Outlook add-in to sign in to TrackBillables:
-      </p>
-      <div style="margin:24px 0;text-align:center;">
-        <span style="display:inline-block;background-color:#f4f4f5;border-radius:8px;padding:16px 32px;font-size:32px;font-weight:700;letter-spacing:8px;color:#18181b;">${escapeHtml(code)}</span>
-      </div>
-      <p style="margin:0 0 16px;color:#71717a;font-size:14px;">
-        This code expires in 10 minutes. If you didn't request this code, you can safely ignore this email.
-      </p>
-    `),
-  };
-}
-
 export function paymentFailedEmail(): { subject: string; html: string } {
   return {
     subject: 'Payment failed — action required',
